@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Dynamic Audio Player</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+      flex-direction: column;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    audio {
+      width: 100%;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+
+    #currentTrack {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 20px;
+      color: #555;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background-color: #e5e5e5;
+      padding: 40px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 700px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      #currentTrack {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Scheduled Audio Player</h1>
+    <audio id="audioPlayer" controls>
+      <source src="https://www.streamadqfm.store/%D9%81%D8%A7%D8%B5%D9%84.mp3" type="audio/mpeg">
+      <source src="https://www.streamadqfm.store/%D9%81%D8%A7%D8%B5%D9%84.ogg" type="audio/ogg">
+      <p>Your browser does not support the audio element. Please use a modern browser.</p>
+    </audio>
+    <br>
+    <button id="playButton" onclick="playScheduledAudio()">Play from Scheduled Time</button>
+    <div id="currentTrack">No track playing</div>
+  </div>
+
+<script>
+  const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00'); // Scheduled start time (Istanbul timezone)
+  const textFileUrl = "https://www.streamadqfm.store/nmsC.m3u"; // URL to .m3u file
+  let tracks = [];
+  let isTracksReady = false;
+  let currentTrackIndex = 0;
+
+  // Fetch and parse the .m3u file
+  async function loadTracks() {
+    try {
+      const response = await fetch(textFileUrl);
+      if (!response.ok) throw new Error('Failed to fetch tracks');
+      const text = await response.text();
+      const lines = text.split("\n").filter(line => line.trim() !== "");
+
+      let tempTrack = null;
+      lines.forEach((line) => {
+        if (line.startsWith("#EXTINF:")) {
+          const parts = line.slice(8).split(",");
+          const duration = parseInt(parts[0], 10) || 1800; // Default 30 mins
+          const name = parts[1]?.trim() || "Unknown Track";
+          tempTrack = { duration, name };
+        } else if (tempTrack && !line.startsWith("#")) {
+          tempTrack.url = line.trim();
+          tracks.push(tempTrack);
+          tempTrack = null;
+        }
+      });
+
+      isTracksReady = true;
+      console.log("Tracks loaded:", tracks);
+    } catch (error) {
+      console.error('Error loading tracks:', error);
+      alert('Failed to load tracks.');
+    }
+  }
+
+  // Calculate the correct track and time based on the scheduled start time
+  function calculateTrackToPlay() {
+    const now = new Date();
+    const button = document.getElementById('playButton');
+
+    if (now < scheduledDateTime) {
+      alert("Scheduled time hasn't reached yet.");
+      return;
+    }
+
+    button.textContent = 'Loading...'; // Change button text
+    button.disabled = true; // Disable the button
+
+    const elapsedTime = Math.floor((now - scheduledDateTime) / 1000); // Time in seconds since scheduled start
+    let cumulativeDuration = 0;
+    let trackStartTime = 0;
+
+    for (let i = 0; i < tracks.length; i++) {
+      cumulativeDuration += tracks[i].duration;
+      if (elapsedTime < cumulativeDuration) {
+        currentTrackIndex = i;
+        trackStartTime = elapsedTime - (cumulativeDuration - tracks[i].duration);
+        break;
+      }
+    }
+
+    // Simulate loading and play the track
+    setTimeout(() => {
+      playTrack(currentTrackIndex, trackStartTime);
+      button.textContent = 'Play from Scheduled Time'; // Reset button text
+      button.disabled = false; // Enable the button
+    }, 1000); // Simulate loading time
+  }
+
+  // Function to play the correct track
+  function playTrack(index, startTime = 0) {
+    const audioPlayer = document.getElementById("audioPlayer");
+    const currentTrackDiv = document.getElementById("currentTrack");
+
+    if (index >= tracks.length) {
+      currentTrackIndex = 0; // Start from the first track if index exceeds
+      startTime = 0;
+    }
+
+    const track = tracks[index];
+    audioPlayer.src = track.url;
+
+    // Update current track info
+    currentTrackDiv.textContent = `Now Playing: ${track.name}`;
+
+    // Wait until metadata is loaded, then start from the calculated start time
+    audioPlayer.onloadedmetadata = () => {
+      audioPlayer.currentTime = startTime;
+      audioPlayer.play().catch(err => console.error("Error starting playback:", err));
+    };
+
+    // If the track ends, move to the next
+    audioPlayer.onended = () => {
+      currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+      playTrack(currentTrackIndex);
+    };
+
+    // Handle playback errors
+    audioPlayer.onerror = () => {
+      console.error("Error with the track.");
+      alert("Playback error.");
+    };
+  }
+
+  // Play the audio from the scheduled time
+  function playScheduledAudio() {
+    if (isTracksReady) {
+      calculateTrackToPlay();
+    } else {
+      alert("Tracks not ready. Please wait.");
+    }
+  }
+
+  // Load the tracks on page load
+  window.onload = loadTracks;
+
+</script>
+</body>
+
+</html>
