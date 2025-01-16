@@ -8,30 +8,52 @@
   <meta name="mobile-web-app-capable" content="yes">
   <title>Dynamic Audio Player</title>
   <style>
-    /* Styles remain the same */
+    /* Modern Dark Theme with Sleek Design */
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+      font-family: 'Poppins', sans-serif;
+      background-color: #1a1a1a;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
-      color: #333;
+      color: #fff;
       flex-direction: column;
+      background: radial-gradient(circle, #2c3e50, #1a1a1a);
     }
 
     h1 {
-      color: #333;
-      font-size: 2rem;
+      color: #fff;
+      font-size: 2.5rem;
       margin-bottom: 20px;
-      font-weight: 600;
+      font-weight: 700;
+      text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      letter-spacing: 1px;
     }
 
     audio {
       width: 100%;
-      border-radius: 4px;
+      max-width: 500px;
+      border-radius: 12px;
       outline: none;
+      margin: 20px 0;
+      filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.5));
+    }
+
+    audio::-webkit-media-controls-panel {
+      background-color: #333;
+      border-radius: 12px;
+    }
+
+    audio::-webkit-media-controls-play-button,
+    audio::-webkit-media-controls-mute-button {
+      background-color: #4CAF50;
+      border-radius: 50%;
+    }
+
+    audio::-webkit-media-controls-current-time-display,
+    audio::-webkit-media-controls-time-remaining-display {
+      color: #fff;
     }
 
     button {
@@ -40,27 +62,39 @@
       background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
       margin-top: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.5px;
     }
 
     button:hover {
       background-color: #45a049;
-      transform: scale(1.05);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     }
 
     #currentTrack {
-      font-weight: bold;
+      font-weight: 600;
       font-size: 1.2rem;
       margin-top: 20px;
-      color: #555;
-      background-color: #fff;
-      padding: 10px;
-      border-radius: 6px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       text-align: center;
+      max-width: 80%;
+      word-wrap: break-word;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .container {
@@ -69,25 +103,81 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      background-color: #e5e5e5;
+      background-color: rgba(255, 255, 255, 0.05);
       padding: 40px;
-      border-radius: 10px;
-      width: 100%;
+      border-radius: 20px;
+      width: 90%;
       max-width: 700px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    select {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 300px;
+      cursor: pointer;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(10px);
+      appearance: none; /* Remove default arrow */
+      -webkit-appearance: none; /* Remove default arrow for Safari */
+      -moz-appearance: none; /* Remove default arrow for Firefox */
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); /* Custom arrow */
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+    }
+
+    select:hover {
+      border-color: #4CAF50;
+      box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #4CAF50;
+      box-shadow: 0 0 16px rgba(76, 175, 80, 0.5);
+    }
+
+    option {
+      background-color: #333; /* Dark background for options */
+      color: #fff; /* Light text for options */
+      padding: 10px; /* Add padding for better spacing */
+    }
+
+    option:hover {
+      background-color: #4CAF50; /* Highlight option on hover */
     }
 
     @media (max-width: 600px) {
       h1 {
-        font-size: 1.5rem;
+        font-size: 2rem;
       }
 
       button {
         width: 100%;
+        padding: 15px;
+        font-size: 1rem;
       }
 
       #currentTrack {
         font-size: 1rem;
+        padding: 10px 15px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      select {
+        font-size: 0.9rem;
       }
     }
   </style>
