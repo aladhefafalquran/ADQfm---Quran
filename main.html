@@ -156,6 +156,41 @@
       background-color: #4CAF50; /* Highlight option on hover */
     }
 
+    #loadingSpinner {
+      display: none;
+      font-size: 1.2rem;
+      margin-top: 20px;
+    }
+
+    #trackList {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .trackItem {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .trackItem:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .trackItem.active {
+      background-color: #4CAF50; /* Highlight color for active track */
+      color: #fff;
+    }
+
     @media (max-width: 600px) {
       h1 {
         font-size: 2rem;
@@ -198,9 +233,11 @@
         <audio id="audioPlayer" controls>
             Your browser does not support the audio element.
         </audio>
-        <br>
+
         <button id="playButton" onclick="calculateTrackToPlay()">Play from Scheduled Time</button>
         <div id="currentTrack">No track playing</div>
+        <div id="loadingSpinner">Loading...</div>
+        <div id="trackList"></div>
     </div>
 
     <script>
@@ -220,6 +257,8 @@
         let currentReader = '';
 
         async function loadTracks(url) {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = 'block'; // Show spinner
             try {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -252,6 +291,7 @@
 
                 isTracksReady = tracks.length > 0;
                 console.log(`Loaded ${tracks.length} tracks`);
+                displayTrackList(); // Display track list
                 return true;
             } catch (error) {
                 console.error('Error in loadTracks:', error);
@@ -259,7 +299,18 @@
                 tracks = [];
                 alert(`Failed to load tracks: ${error.message}`);
                 return false;
+            } finally {
+                spinner.style.display = 'none'; // Hide spinner
             }
+        }
+
+        function displayTrackList() {
+            const trackListDiv = document.getElementById('trackList');
+            trackListDiv.innerHTML = tracks.map((track, index) => `
+                <div class="trackItem ${index === currentTrackIndex ? 'active' : ''}" onclick="playTrack(${index})">
+                    ${track.name}
+                </div>
+            `).join('');
         }
 
         function calculateTrackToPlay() {
@@ -327,13 +378,25 @@
             audioPlayer.src = track.url;
             currentTrackDiv.textContent = `Now Playing: ${track.name}`;
 
+            // Highlight the active track in the track list
+            const trackItems = document.querySelectorAll('.trackItem');
+            trackItems.forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+
+            // Auto-scroll to the active track
+            const activeTrackItem = trackItems[index];
+            if (activeTrackItem) {
+                activeTrackItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
             audioPlayer.onloadedmetadata = () => {
                 try {
                     audioPlayer.currentTime = startTime;
                     audioPlayer.play()
                         .catch(err => {
                             console.error("Playback error:", err);
-                            alert("Error starting playback. Please try again.");
+                            alert("Error starting playback. Please click the play button.");
                         });
                 } catch (e) {
                     console.error("Error setting current time:", e);
@@ -361,11 +424,18 @@
             isTracksReady = false;
             tracks = [];
             
+            // Stop the current audio playback
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.pause();
+            audioPlayer.src = '';
+            
             const success = await loadTracks(m3uLinks[currentReader]);
             select.disabled = false;
             
             if (success) {
                 console.log(`Successfully loaded ${tracks.length} tracks for ${currentReader}`);
+                // Automatically start playing from the scheduled time for the new reader
+                calculateTrackToPlay();
             }
         }
 
