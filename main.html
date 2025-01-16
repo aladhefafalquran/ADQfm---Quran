@@ -255,6 +255,7 @@
         let isTracksReady = false;
         let currentTrackIndex = 0;
         let currentReader = '';
+        let isPlaying = false; // Track if audio is currently playing
 
         async function loadTracks(url) {
             const spinner = document.getElementById('loadingSpinner');
@@ -314,54 +315,51 @@
         }
 
         function calculateTrackToPlay() {
-            const now = new Date();
-            const button = document.getElementById('playButton');
-            button.textContent = 'Loading...';
+    const now = new Date();
+    const button = document.getElementById('playButton');
+    button.textContent = 'Loading...';
 
-            if (!isTracksReady || tracks.length === 0) {
-                console.error('Tracks not ready or empty');
-                alert('Please wait for tracks to load');
-                button.textContent = 'Play from Scheduled Time';
-                return;
-            }
+    if (!isTracksReady || tracks.length === 0) {
+        console.error('Tracks not ready or empty');
+        alert('Please wait for tracks to load');
+        button.textContent = 'Play from Scheduled Time';
+        return;
+    }
 
-            const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
-            const elapsedSeconds = Math.floor((now - scheduledDateTime) / 1000);
+    const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
+    const elapsedSeconds = Math.floor((now - scheduledDateTime) / 1000);
+    
+    console.log('Total duration:', totalDuration, 'Elapsed seconds:', elapsedSeconds);
+    
+    // Calculate position in current cycle
+    let remainingTime = elapsedSeconds % totalDuration;
+    let accumulatedTime = 0;
+
+    // Find correct track and starting point
+    for (let i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+        accumulatedTime += track.duration;
+
+        if (remainingTime < accumulatedTime) {
+            const trackOffset = remainingTime - (accumulatedTime - track.duration);
+            currentTrackIndex = i;
             
-            console.log('Total duration:', totalDuration, 'Elapsed seconds:', elapsedSeconds);
+            console.log(`Playing track ${i} (${track.name}) from ${trackOffset}s`);
             
-            // Calculate position in current cycle
-            let remainingTime = elapsedSeconds % totalDuration;
-            let accumulatedTime = 0;
-
-            // Check if the reader is random
-            const isRandom = currentReader === 'random';
-
-            // Find correct track
-            for (let i = 0; i < tracks.length; i++) {
-                const track = tracks[i];
-                accumulatedTime += track.duration;
-
-                if (remainingTime < accumulatedTime) {
-                    const trackOffset = remainingTime - (accumulatedTime - track.duration);
-                    currentTrackIndex = i;
-                    
-                    console.log(`Playing track ${i} from ${trackOffset}s (Random: ${isRandom})`);
-                    
-                    setTimeout(() => {
-                        playTrack(i, trackOffset, isRandom);
-                        button.textContent = 'Play from Scheduled Time';
-                    }, 1000);
-                    return;
-                }
-            }
-
-            // Fallback to first track if calculation fails
             setTimeout(() => {
-                playTrack(0, 0, isRandom);
+                playTrack(i, trackOffset);
                 button.textContent = 'Play from Scheduled Time';
             }, 1000);
+            return;
         }
+    }
+
+    // Fallback to first track if calculation fails
+    setTimeout(() => {
+        playTrack(0, 0);
+        button.textContent = 'Play from Scheduled Time';
+    }, 1000);
+}
 
         function playTrack(index, startTime = 0, isRandom = false) {
             const audioPlayer = document.getElementById("audioPlayer");
@@ -435,9 +433,21 @@
             if (success) {
                 console.log(`Successfully loaded ${tracks.length} tracks for ${currentReader}`);
                 // Automatically start playing from the scheduled time for the new reader
-                calculateTrackToPlay();
+                if (isPlaying) { // Only autoplay if audio was already playing
+                    calculateTrackToPlay();
+                }
             }
         }
+
+        // Track if audio is playing
+        const audioPlayer = document.getElementById('audioPlayer');
+        audioPlayer.addEventListener('play', () => {
+            isPlaying = true;
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            isPlaying = false;
+        });
 
         window.onload = () => {
             console.log('Page loaded, initializing player...');
