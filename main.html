@@ -8,213 +8,524 @@
   <meta name="mobile-web-app-capable" content="yes">
   <title>Dynamic Audio Player</title>
   <style>
-    /* Modern Dark Theme with Sleek Design */
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #1a1a1a;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      color: #fff;
-      flex-direction: column;
-      background: radial-gradient(circle, #2c3e50, #1a1a1a);
-    }
+ /* Modern Dark Theme with Sleek Design */
 
-    h1 {
-      color: #fff;
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-      font-weight: 700;
-      text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-      letter-spacing: 1px;
-    }
+    /* CSS Reset */
 
-    audio {
-      width: 100%;
-      max-width: 500px;
-      border-radius: 12px;
-      outline: none;
-      margin: 20px 0;
-      filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.5));
-    }
+* {
 
-    audio::-webkit-media-controls-panel {
-      background-color: #333;
-      border-radius: 12px;
-    }
+  margin: 0;
 
-    audio::-webkit-media-controls-play-button,
-    audio::-webkit-media-controls-mute-button {
-      background-color: #4CAF50;
-      border-radius: 50%;
-    }
+  padding: 0;
 
-    audio::-webkit-media-controls-current-time-display,
-    audio::-webkit-media-controls-time-remaining-display {
-      color: #fff;
-    }
+  box-sizing: border-box;
 
-    button {
-      padding: 12px 24px;
-      font-size: 1.1rem;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-      margin-top: 15px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-      letter-spacing: 0.5px;
-    }
+}
 
-    button:hover {
-      background-color: #45a049;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    }
 
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    }
 
-    #currentTrack {
-      font-weight: 600;
-      font-size: 1.2rem;
-      margin-top: 20px;
-      color: #fff;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 15px 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      max-width: 80%;
-      word-wrap: break-word;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+html, body {
 
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      background-color: rgba(255, 255, 255, 0.05);
-      padding: 40px;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 700px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+  width: 100%;
 
-    select {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background-color: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 300px;
-      cursor: pointer;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      backdrop-filter: blur(10px);
-      appearance: none; /* Remove default arrow */
-      -webkit-appearance: none; /* Remove default arrow for Safari */
-      -moz-appearance: none; /* Remove default arrow for Firefox */
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); /* Custom arrow */
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      background-size: 12px;
-    }
+  height: 100%;
 
-    select:hover {
-      border-color: #4CAF50;
-      box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
-    }
+}
 
-    select:focus {
-      outline: none;
-      border-color: #4CAF50;
-      box-shadow: 0 0 16px rgba(76, 175, 80, 0.5);
-    }
 
-    option {
-      background-color: #333; /* Dark background for options */
-      color: #fff; /* Light text for options */
-      padding: 10px; /* Add padding for better spacing */
-    }
 
-    option:hover {
-      background-color: #4CAF50; /* Highlight option on hover */
-    }
+/* Remove default list styles */
 
-    #loadingSpinner {
-      display: none;
-      font-size: 1.2rem;
-      margin-top: 20px;
-    }
+ul, ol {
 
-    #trackList {
-      margin-top: 20px;
-      width: 100%;
-      max-width: 500px;
-      max-height: 200px;
-      overflow-y: auto;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 10px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+  list-style: none;
 
-    .trackItem {
-      padding: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+}
 
-    .trackItem:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
 
-    .trackItem.active {
-      background-color: #4CAF50; /* Highlight color for active track */
-      color: #fff;
-    }
 
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2rem;
-      }
+/* Remove default button styles */
 
-      button {
-        width: 100%;
-        padding: 15px;
-        font-size: 1rem;
-      }
+button {
 
-      #currentTrack {
-        font-size: 1rem;
-        padding: 10px 15px;
-      }
+  background: none;
 
-      .container {
-        padding: 20px;
-      }
+  border: none;
 
-      select {
-        font-size: 0.9rem;
-      }
-    }
+  padding: 0;
+
+  font: inherit;
+
+  cursor: pointer;
+
+}
+
+
+
+/* Remove default link styles */
+
+a {
+
+  text-decoration: none;
+
+  color: inherit;
+
+}
+
+
+
+/* Modern Dark Theme with Sleek Design */
+
+body {
+
+  font-family: 'Poppins', sans-serif;
+
+  background-color: #1a1a1a;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  height: 100vh;
+
+  margin: 0;
+
+  color: #fff;
+
+  flex-direction: column;
+
+  background: radial-gradient(circle, #2c3e50, #1a1a1a);
+
+}
+
+
+
+h1 {
+
+  color: #fff;
+
+  font-size: 2.5rem;
+
+  margin-bottom: 20px;
+
+  font-weight: 700;
+
+  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+
+  letter-spacing: 1px;
+
+}
+
+
+
+audio {
+
+  width: 100%;
+
+  max-width: 500px;
+
+  border-radius: 12px;
+
+  outline: none;
+
+  margin: 20px 0;
+
+  filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.5));
+
+}
+
+
+
+audio::-webkit-media-controls-panel {
+
+  background-color: #333;
+
+  border-radius: 12px;
+
+}
+
+
+
+audio::-webkit-media-controls-play-button,
+
+audio::-webkit-media-controls-mute-button {
+
+  background-color: #4CAF50;
+
+  border-radius: 50%;
+
+}
+
+
+
+audio::-webkit-media-controls-current-time-display,
+
+audio::-webkit-media-controls-time-remaining-display {
+
+  color: #fff;
+
+}
+
+
+
+button {
+
+  padding: 12px 24px;
+
+  font-size: 1.1rem;
+
+  background-color: #4CAF50;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+
+  margin-top: 15px;
+
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+  letter-spacing: 0.5px;
+
+}
+
+
+
+button:hover {
+
+  background-color: #45a049;
+
+  transform: translateY(-3px);
+
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+
+}
+
+
+
+button:active {
+
+  transform: translateY(0);
+
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+}
+
+
+
+#currentTrack {
+
+  font-weight: 600;
+
+  font-size: 1.2rem;
+
+  margin-top: 20px;
+
+  color: #fff;
+
+  background-color: rgba(255, 255, 255, 0.1);
+
+  padding: 15px 20px;
+
+  border-radius: 8px;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+  text-align: center;
+
+  max-width: 80%;
+
+  word-wrap: break-word;
+
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+}
+
+
+
+.container {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  background-color: rgba(255, 255, 255, 0.05);
+
+  padding: 40px;
+
+  border-radius: 20px;
+
+  width: 90%;
+
+  max-width: 700px;
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+}
+
+
+
+select {
+
+  padding: 10px;
+
+  font-size: 1rem;
+
+  border-radius: 8px;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  background-color: rgba(255, 255, 255, 0.1);
+
+  color: #fff;
+
+  margin-bottom: 20px;
+
+  width: 100%;
+
+  max-width: 300px;
+
+  cursor: pointer;
+
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  backdrop-filter: blur(10px);
+
+  appearance: none; /* Remove default arrow */
+
+  -webkit-appearance: none; /* Remove default arrow for Safari */
+
+  -moz-appearance: none; /* Remove default arrow for Firefox */
+
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); /* Custom arrow */
+
+  background-repeat: no-repeat;
+
+  background-position: right 10px center;
+
+  background-size: 12px;
+
+}
+
+
+
+select:hover {
+
+  border-color: #4CAF50;
+
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+
+}
+
+
+
+select:focus {
+
+  outline: none;
+
+  border-color: #4CAF50;
+
+  box-shadow: 0 0 16px rgba(76, 175, 80, 0.5);
+
+}
+
+
+
+option {
+
+  background-color: #333; /* Dark background for options */
+
+  color: #fff; /* Light text for options */
+
+  padding: 10px; /* Add padding for better spacing */
+
+}
+
+
+
+option:hover {
+
+  background-color: #4CAF50; /* Highlight option on hover */
+
+}
+
+
+
+#loadingSpinner {
+
+  display: none;
+
+  font-size: 1.2rem;
+
+  margin-top: 20px;
+
+}
+
+
+
+#trackList {
+
+  margin-top: 20px;
+
+  width: 100%;
+
+  max-width: 500px;
+
+  max-height: 200px;
+
+  overflow-y: auto;
+
+  background: rgba(255, 255, 255, 0.1);
+
+  border-radius: 8px;
+
+  padding: 10px;
+
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+}
+
+
+
+.trackItem {
+
+  padding: 10px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  cursor: pointer;
+
+  transition: background-color 0.3s ease;
+
+}
+
+
+
+.trackItem:hover {
+
+  background-color: rgba(255, 255, 255, 0.2);
+
+}
+
+
+
+.trackItem.active {
+
+  background-color: #4CAF50; /* Highlight color for active track */
+
+  color: #fff;
+
+}
+
+
+
+/* Firefox scrollbar styling */
+
+#trackList {
+
+  scrollbar-width: thin;
+
+  scrollbar-color: #4CAF50 #1a1a1a;
+
+}
+
+
+
+/* Chrome/Safari scrollbar styling */
+
+#trackList::-webkit-scrollbar {
+
+  width: 8px;
+
+}
+
+
+
+#trackList::-webkit-scrollbar-thumb {
+
+  background-color: #4CAF50;
+
+}
+
+
+
+#trackList::-webkit-scrollbar-track {
+
+  background-color: #1a1a1a;
+
+}
+
+
+
+@media (max-width: 600px) {
+
+  h1 {
+
+    font-size: 2rem;
+
+  }
+
+
+
+  button {
+
+    width: 100%;
+
+    padding: 15px;
+
+    font-size: 1rem;
+
+  }
+
+
+
+  #currentTrack {
+
+    font-size: 1rem;
+
+    padding: 10px 15px;
+
+  }
+
+
+
+  .container {
+
+    padding: 20px;
+
+  }
+
+
+
+  select {
+
+    font-size: 0.9rem;
+
+  }
+
+}
+
   </style>
 </head>
 <body>
@@ -317,12 +628,12 @@
         function calculateTrackToPlay() {
     const now = new Date();
     const button = document.getElementById('playButton');
-    button.textContent = 'Loading...';
+    button.textContent = 'جاري التجهيز...';
 
     if (!isTracksReady || tracks.length === 0) {
         console.error('Tracks not ready or empty');
         alert('Please wait for tracks to load');
-        button.textContent = 'Play from Scheduled Time';
+        button.textContent = 'ابدا التشغيل كبث قرآني';
         return;
     }
 
@@ -348,7 +659,7 @@
             
             setTimeout(() => {
                 playTrack(i, trackOffset);
-                button.textContent = 'Play from Scheduled Time';
+                button.textContent = 'ابدا التشغيل كبث قرآني';
             }, 1000);
             return;
         }
@@ -357,7 +668,7 @@
     // Fallback to first track if calculation fails
     setTimeout(() => {
         playTrack(0, 0);
-        button.textContent = 'Play from Scheduled Time';
+        button.textContent = 'ابدا التشغيل كبث قرآني';
     }, 1000);
 }
 
