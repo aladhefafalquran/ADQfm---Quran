@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>Dynamic Audio Player</title>
+  <title>البرنامج القرآني</title>
   <style>
  /* Modern Dark Theme with Sleek Design */
 
@@ -534,18 +534,18 @@ option:hover {
         
         <select id="readerSelect" onchange="loadSelectedReader()">
             <option value="random">قارئ عشوائي</option>
-            <option value="exclusive">الحصري</option>
-            <option value="tobalawi">الطبلاوي</option>
-            <option value="manshawi">المنشاوي</option>
-            <option value="abdbasat">عبد الباسط</option>
-            <option value="mahmoudbanna">محمود البنا</option>
+            <option value="exclusive">محمود خليل الحصري</option>
+            <option value="tobalawi">محمد محمود الطبلاوي</option>
+            <option value="manshawi">محمد صديق المنشاوي</option>
+            <option value="abdbasat">عبد الباسط عبد الصمد</option>
+            <option value="mahmoudbanna">محمود علي البنا</option>
         </select>
 
         <audio id="audioPlayer" controls>
             Your browser does not support the audio element.
         </audio>
 
-        <button id="playButton" onclick="calculateTrackToPlay()">ابدا التشغيل كبث قرآني</button>
+        <button id="playButton" onclick="calculateTrackToPlay()">تشغيل كبث قرآني</button>
         <div id="currentTrack">لاتوجد وسائط قيد التشغيل</div>
         <div id="loadingSpinner">جاري التجهيز...</div>
         <div id="trackList"></div>
