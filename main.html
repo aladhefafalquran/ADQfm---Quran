@@ -633,7 +633,7 @@ option:hover {
     if (!isTracksReady || tracks.length === 0) {
         console.error('Tracks not ready or empty');
         alert('Please wait for tracks to load');
-        button.textContent = 'ابدا التشغيل كبث قرآني';
+        button.textContent = 'تشغيل كبث قرآني';
         return;
     }
 
@@ -659,7 +659,7 @@ option:hover {
             
             setTimeout(() => {
                 playTrack(i, trackOffset);
-                button.textContent = 'ابدا التشغيل كبث قرآني';
+                button.textContent = 'تشغيل كبث قرآني';
             }, 1000);
             return;
         }
@@ -668,7 +668,7 @@ option:hover {
     // Fallback to first track if calculation fails
     setTimeout(() => {
         playTrack(0, 0);
-        button.textContent = 'ابدا التشغيل كبث قرآني';
+        button.textContent = 'تشغيل كبث قرآني';
     }, 1000);
 }
 
