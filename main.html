@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,762 +8,662 @@
   <meta name="mobile-web-app-capable" content="yes">
   <title>البرنامج القرآني</title>
   <style>
- /* Modern Dark Theme with Sleek Design */
+    /* Modern Dark Theme with Sleek Design */
 
-    /* CSS Reset */
-
+/* CSS Reset */
 * {
-
   margin: 0;
-
   padding: 0;
-
   box-sizing: border-box;
-
 }
-
-
 
 html, body {
-
   width: 100%;
-
   height: 100%;
-
 }
-
-
 
 /* Remove default list styles */
-
 ul, ol {
-
   list-style: none;
-
 }
-
-
 
 /* Remove default button styles */
-
 button {
-
   background: none;
-
   border: none;
-
   padding: 0;
-
   font: inherit;
-
   cursor: pointer;
-
 }
-
-
 
 /* Remove default link styles */
-
 a {
-
   text-decoration: none;
-
   color: inherit;
-
 }
-
-
 
 /* Modern Dark Theme with Sleek Design */
-
 body {
-
   font-family: 'Poppins', sans-serif;
-
   background-color: #1a1a1a;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   height: 100vh;
-
   margin: 0;
-
   color: #fff;
-
   flex-direction: column;
-
   background: radial-gradient(circle, #2c3e50, #1a1a1a);
-
+  padding: 20px 0; /* Add space at the top and bottom */
 }
-
-
 
 h1 {
-
   color: #fff;
-
   font-size: 2.5rem;
-
   margin-bottom: 20px;
-
   font-weight: 700;
-
   text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-
   letter-spacing: 1px;
-
 }
-
-
 
 audio {
-
   width: 100%;
-
   max-width: 500px;
-
   border-radius: 12px;
-
   outline: none;
-
   margin: 20px 0;
-
   filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.5));
-
 }
-
-
 
 audio::-webkit-media-controls-panel {
-
   background-color: #333;
-
   border-radius: 12px;
-
 }
-
-
 
 audio::-webkit-media-controls-play-button,
-
 audio::-webkit-media-controls-mute-button {
-
   background-color: #4CAF50;
-
   border-radius: 50%;
-
 }
-
-
 
 audio::-webkit-media-controls-current-time-display,
-
 audio::-webkit-media-controls-time-remaining-display {
-
   color: #fff;
-
 }
-
-
 
 button {
-
   padding: 12px 24px;
-
   font-size: 1.1rem;
-
   background-color: #4CAF50;
-
   color: white;
-
   border: none;
-
   border-radius: 8px;
-
   cursor: pointer;
-
   transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-
   margin-top: 15px;
-
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-
   letter-spacing: 0.5px;
-
 }
-
-
 
 button:hover {
-
   background-color: #45a049;
-
   transform: translateY(-3px);
-
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-
 }
-
-
 
 button:active {
-
   transform: translateY(0);
-
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-
 }
-
-
 
 #currentTrack {
-
   font-weight: 600;
-
   font-size: 1.2rem;
-
   margin-top: 20px;
-
   color: #fff;
-
   background-color: rgba(255, 255, 255, 0.1);
-
   padding: 15px 20px;
-
   border-radius: 8px;
-
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-
   text-align: center;
-
   max-width: 80%;
-
   word-wrap: break-word;
-
   backdrop-filter: blur(10px);
-
   border: 1px solid rgba(255, 255, 255, 0.1);
-
 }
-
-
 
 .container {
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: center;
-
   text-align: center;
-
   background-color: rgba(255, 255, 255, 0.05);
-
   padding: 40px;
-
   border-radius: 20px;
-
   width: 90%;
-
   max-width: 700px;
-
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-
   backdrop-filter: blur(10px);
-
   border: 1px solid rgba(255, 255, 255, 0.1);
-
+  position: relative; /* For positioning the language dropdown */
 }
-
-
 
 select {
-
   padding: 10px;
-
   font-size: 1rem;
-
   border-radius: 8px;
-
   border: 1px solid rgba(255, 255, 255, 0.2);
-
   background-color: rgba(255, 255, 255, 0.1);
-
   color: #fff;
-
   margin-bottom: 20px;
-
   width: 100%;
-
   max-width: 300px;
-
   cursor: pointer;
-
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-
   backdrop-filter: blur(10px);
-
-  appearance: none; /* Remove default arrow */
-
-  -webkit-appearance: none; /* Remove default arrow for Safari */
-
-  -moz-appearance: none; /* Remove default arrow for Firefox */
-
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); /* Custom arrow */
-
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
-
   background-position: right 10px center;
-
   background-size: 12px;
-
 }
-
-
 
 select:hover {
-
   border-color: #4CAF50;
-
   box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
-
 }
-
-
 
 select:focus {
-
   outline: none;
-
   border-color: #4CAF50;
-
   box-shadow: 0 0 16px rgba(76, 175, 80, 0.5);
-
 }
-
-
 
 option {
-
-  background-color: #333; /* Dark background for options */
-
-  color: #fff; /* Light text for options */
-
-  padding: 10px; /* Add padding for better spacing */
-
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
 }
-
-
 
 option:hover {
-
-  background-color: #4CAF50; /* Highlight option on hover */
-
+  background-color: #4CAF50;
 }
-
-
 
 #loadingSpinner {
-
   display: none;
-
   font-size: 1.2rem;
-
   margin-top: 20px;
-
 }
-
-
 
 #trackList {
-
   margin-top: 20px;
-
   width: 100%;
-
   max-width: 500px;
-
   max-height: 200px;
-
   overflow-y: auto;
-
   background: rgba(255, 255, 255, 0.1);
-
   border-radius: 8px;
-
   padding: 10px;
-
   backdrop-filter: blur(10px);
-
   border: 1px solid rgba(255, 255, 255, 0.1);
-
 }
-
-
 
 .trackItem {
-
   padding: 10px;
-
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
   cursor: pointer;
-
   transition: background-color 0.3s ease;
-
 }
-
-
 
 .trackItem:hover {
-
   background-color: rgba(255, 255, 255, 0.2);
-
 }
-
-
 
 .trackItem.active {
-
-  background-color: #4CAF50; /* Highlight color for active track */
-
+  background-color: #4CAF50;
   color: #fff;
-
 }
-
-
 
 /* Firefox scrollbar styling */
-
 #trackList {
-
   scrollbar-width: thin;
-
   scrollbar-color: #4CAF50 #1a1a1a;
-
 }
-
-
 
 /* Chrome/Safari scrollbar styling */
-
 #trackList::-webkit-scrollbar {
-
   width: 8px;
-
 }
-
-
 
 #trackList::-webkit-scrollbar-thumb {
-
   background-color: #4CAF50;
-
 }
-
-
 
 #trackList::-webkit-scrollbar-track {
-
   background-color: #1a1a1a;
-
 }
 
+/* Language Select Dropdown */
+.language-select {
+  position: absolute; /* Position the dropdown in the corner */
+  top: 20px; /* Distance from the top */
+  right: 20px; /* Distance from the right */
+}
 
+.language-select select {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(10px);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  /* Remove the arrow */
+  background-image: none;
+}
 
-@media (max-width: 600px) {
+.language-select select:hover {
+  border-color: #4CAF50;
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+}
 
+.language-select select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 16px rgba(76, 175, 80, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   h1 {
-
-    font-size: 2rem;
-
+    font-size: 1.8rem; /* Smaller font size for smaller screens */
+    margin-top: 40px; /* Add space at the top to avoid overlap */
+    text-align: center; /* Center the app name */
   }
-
-
-
-  button {
-
-    width: 100%;
-
-    padding: 15px;
-
-    font-size: 1rem;
-
-  }
-
-
-
-  #currentTrack {
-
-    font-size: 1rem;
-
-    padding: 10px 15px;
-
-  }
-
-
 
   .container {
-
-    padding: 20px;
-
+    padding: 20px; /* Reduce padding for smaller screens */
+    width: 95%; /* Increase width for better use of space */
   }
-
-
 
   select {
-
-    font-size: 0.9rem;
-
+    font-size: 0.9rem; /* Smaller font size for dropdowns */
+    max-width: 100%; /* Full width for dropdowns */
   }
 
+  button {
+    width: 100%; /* Full width for buttons */
+    padding: 15px; /* Slightly larger padding for easier tapping */
+    font-size: 1rem; /* Smaller font size for buttons */
+  }
+
+  #currentTrack {
+    font-size: 1rem; /* Smaller font size for current track */
+    padding: 10px 15px; /* Adjust padding */
+  }
+
+  .language-select {
+    top: 10px; /* Move the language dropdown closer to the top */
+    right: 10px; /* Move the language dropdown closer to the right */
+  }
+
+  audio {
+    max-width: 100%; /* Full width for audio player */
+  }
+
+  #trackList {
+    max-height: 150px; /* Reduce max height for track list */
+  }
 }
 
-  </style>
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem; /* Even smaller font size for very small screens */
+    margin-top: 50px; /* Add more space at the top */
+  }
+
+  .container {
+    padding: 15px; /* Further reduce padding */
+  }
+
+  select {
+    font-size: 0.8rem; /* Smaller font size for dropdowns */
+  }
+
+  button {
+    font-size: 0.9rem; /* Smaller font size for buttons */
+  }
+
+  #currentTrack {
+    font-size: 0.9rem; /* Smaller font size for current track */
+  }
+
+  .language-select select {
+    font-size: 0.9rem; /* Smaller font size for language select */
+    padding: 8px; /* Reduce padding for smaller screens */
+  }
+
+  .language-select {
+    top: 5px; /* Move the language dropdown even closer to the top */
+    right: 5px; /* Move the language dropdown even closer to the right */
+  }
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>البرنامج القرآني</h1>
-        
-        <select id="readerSelect" onchange="loadSelectedReader()">
-            <option value="random">قارئ عشوائي</option>
-            <option value="exclusive">محمود خليل الحصري</option>
-            <option value="tobalawi">محمد محمود الطبلاوي</option>
-            <option value="manshawi">محمد صديق المنشاوي</option>
-            <option value="abdbasat">عبد الباسط عبد الصمد</option>
-            <option value="mahmoudbanna">محمود علي البنا</option>
-        </select>
-
-        <audio id="audioPlayer" controls>
-            Your browser does not support the audio element.
-        </audio>
-
-        <button id="playButton" onclick="calculateTrackToPlay()">تشغيل كبث قرآني</button>
-        <div id="currentTrack">لاتوجد وسائط قيد التشغيل</div>
-        <div id="loadingSpinner">جاري التجهيز...</div>
-        <div id="trackList"></div>
+  <div class="container">
+    <h1 data-translate="البرنامج القرآني" data-ar="البرنامج القرآني">البرنامج القرآني</h1>
+    
+    <!-- Language Select Dropdown -->
+    <div class="language-select">
+      <select id="languageSelect">
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+      </select>
     </div>
 
-    <script>
-        const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
-        const m3uLinks = {
-            random: "https://www.streamadqfm.store/nmsC.m3u",
-            exclusive: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%AD%D8%B5%D8%B1%D9%8A.m3u",
-            tobalawi: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%B7%D8%A8%D9%84%D8%A7%D9%88%D9%8A.m3u",
-            manshawi: "https://www.streamadqfm.store/%D8%A7%D9%84%D9%85%D9%86%D8%B4%D8%A7%D9%88%D9%8A.m3u",
-            abdbasat: "https://www.streamadqfm.store/%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7.m3u",
-            mahmoudbanna: "https://www.streamadqfm.store/%D9%85%D8%AD%D9%85%D9%88%D8%AF%20%D8%A7%D9%84%D8%A8%D9%86%D8%A7.m3u"
-        };
+    <select id="readerSelect" onchange="loadSelectedReader()">
+      <option value="random" data-translate="قارئ عشوائي" data-ar="قارئ عشوائي">قارئ عشوائي</option>
+      <option value="exclusive" data-translate="محمود خليل الحصري" data-ar="محمود خليل الحصري">محمود خليل الحصري</option>
+      <option value="tobalawi" data-translate="محمد محمود الطبلاوي" data-ar="محمد محمود الطبلاوي">محمد محمود الطبلاوي</option>
+      <option value="manshawi" data-translate="محمد صديق المنشاوي" data-ar="محمد صديق المنشاوي">محمد صديق المنشاوي</option>
+      <option value="abdbasat" data-translate="عبد الباسط عبد الصمد" data-ar="عبد الباسط عبد الصمد">عبد الباسط عبد الصمد</option>
+      <option value="mahmoudbanna" data-translate="محمود علي البنا" data-ar="محمود علي البنا">محمود علي البنا</option>
+    </select>
 
-        let tracks = [];
-        let isTracksReady = false;
-        let currentTrackIndex = 0;
-        let currentReader = '';
-        let isPlaying = false; // Track if audio is currently playing
+    <audio id="audioPlayer" controls>
+      Your browser does not support the audio element.
+    </audio>
 
-        async function loadTracks(url) {
-            const spinner = document.getElementById('loadingSpinner');
-            spinner.style.display = 'block'; // Show spinner
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                const text = await response.text();
-                const lines = text.split("\n").filter(line => line.trim() !== "");
-                
-                tracks = [];
-                let tempTrack = null;
-                
-                console.log('Parsing M3U file...');
-                
-                for (const line of lines) {
-                    if (line.startsWith("#EXTINF:")) {
-                        try {
-                            const parts = line.slice(8).split(",");
-                            const duration = Math.max(parseFloat(parts[0]) || 1800, 0);
-                            const name = parts[1]?.trim() || "Unknown Track";
-                            tempTrack = { duration, name };
-                        } catch (e) {
-                            console.error('Error parsing EXTINF line:', line, e);
-                            tempTrack = null;
-                        }
-                    } else if (tempTrack && !line.startsWith("#")) {
-                        tempTrack.url = line.trim();
-                        tracks.push(tempTrack);
-                        tempTrack = null;
-                    }
-                }
+    <button id="playButton" onclick="calculateTrackToPlay()" data-translate="تشغيل كبث قرآني" data-ar="تشغيل كبث قرآني">تشغيل كبث قرآني</button>
+    <div id="currentTrack" data-translate="لاتوجد وسائط قيد التشغيل" data-ar="لاتوجد وسائط قيد التشغيل">لاتوجد وسائط قيد التشغيل</div>
+    <div id="loadingSpinner">جاري التجهيز...</div>
+    <div id="trackList"></div>
+  </div>
 
-                isTracksReady = tracks.length > 0;
-                console.log(`Loaded ${tracks.length} tracks`);
-                displayTrackList(); // Display track list
-                return true;
-            } catch (error) {
-                console.error('Error in loadTracks:', error);
-                isTracksReady = false;
-                tracks = [];
-                alert(`Failed to load tracks: ${error.message}`);
-                return false;
-            } finally {
-                spinner.style.display = 'none'; // Hide spinner
-            }
+  <script>
+    const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
+    const m3uLinks = {
+      random: "https://www.streamadqfm.store/nmsC.m3u",
+      exclusive: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%AD%D8%B5%D8%B1%D9%8A.m3u",
+      tobalawi: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%B7%D8%A8%D9%84%D8%A7%D9%88%D9%8A.m3u",
+      manshawi: "https://www.streamadqfm.store/%D8%A7%D9%84%D9%85%D9%86%D8%B4%D8%A7%D9%88%D9%8A.m3u",
+      abdbasat: "https://www.streamadqfm.store/%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7.m3u",
+      mahmoudbanna: "https://www.streamadqfm.store/%D9%85%D8%AD%D9%85%D9%88%D8%AF%20%D8%A7%D9%84%D8%A8%D9%86%D8%A7.m3u"
+    };
+
+    const translationFiles = {
+      main: "https://www.streamadqfm.store/translated/en/main.json"
+    };
+
+    let tracks = [];
+    let isTracksReady = false;
+    let currentTrackIndex = 0;
+    let currentReader = '';
+    let isPlaying = false;
+    let translations = {};
+    let isTranslated = false;
+
+    // Load language preference from localStorage
+    const savedLanguage = localStorage.getItem('language') || 'ar';
+    isTranslated = savedLanguage === 'en';
+
+    async function loadTracks(url) {
+      const spinner = document.getElementById('loadingSpinner');
+      spinner.style.display = 'block';
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const text = await response.text();
+        const lines = text.split("\n").filter(line => line.trim() !== "");
+        tracks = [];
+        let tempTrack = null;
+        for (const line of lines) {
+          if (line.startsWith("#EXTINF:")) {
+            const parts = line.slice(8).split(",");
+            const duration = Math.max(parseFloat(parts[0]) || 1800, 0);
+            const name = parts[1]?.trim() || "Unknown Track";
+            tempTrack = { duration, name };
+          } else if (tempTrack && !line.startsWith("#")) {
+            tempTrack.url = line.trim();
+            tracks.push(tempTrack);
+            tempTrack = null;
+          }
         }
-
-        function displayTrackList() {
-            const trackListDiv = document.getElementById('trackList');
-            trackListDiv.innerHTML = tracks.map((track, index) => `
-                <div class="trackItem ${index === currentTrackIndex ? 'active' : ''}" onclick="playTrack(${index})">
-                    ${track.name}
-                </div>
-            `).join('');
-        }
-
-        function calculateTrackToPlay() {
-    const now = new Date();
-    const button = document.getElementById('playButton');
-    button.textContent = 'جاري التجهيز...';
-
-    if (!isTracksReady || tracks.length === 0) {
-        console.error('Tracks not ready or empty');
-        alert('Please wait for tracks to load');
-        button.textContent = 'تشغيل كبث قرآني';
-        return;
+        isTracksReady = tracks.length > 0;
+        displayTrackList();
+        return true;
+      } catch (error) {
+        console.error('Error in loadTracks:', error);
+        isTracksReady = false;
+        tracks = [];
+        alert(`Failed to load tracks: ${error.message}`);
+        return false;
+      } finally {
+        spinner.style.display = 'none';
+      }
     }
 
-    const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
-    const elapsedSeconds = Math.floor((now - scheduledDateTime) / 1000);
-    
-    console.log('Total duration:', totalDuration, 'Elapsed seconds:', elapsedSeconds);
-    
-    // Calculate position in current cycle
-    let remainingTime = elapsedSeconds % totalDuration;
-    let accumulatedTime = 0;
+    function displayTrackList() {
+      const trackListDiv = document.getElementById('trackList');
+      trackListDiv.innerHTML = tracks.map((track, index) => `
+        <div class="trackItem ${index === currentTrackIndex ? 'active' : ''}" onclick="playTrack(${index})">
+          ${translations[track.name] || track.name}
+        </div>
+      `).join('');
+    }
 
-    // Find correct track and starting point
-    for (let i = 0; i < tracks.length; i++) {
+    async function loadTranslations() {
+      const url = translationFiles.main;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        translations = await response.json();
+        console.log('Translations loaded:', translations);
+      } catch (error) {
+        console.error('Error loading translations:', error);
+        translations = {};
+      }
+    }
+
+    function translateUI(lang = 'ar') {
+      const elementsToTranslate = document.querySelectorAll('[data-translate]');
+      elementsToTranslate.forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[key] && lang === 'en') {
+          element.textContent = translations[key];
+        } else {
+          element.textContent = element.getAttribute('data-ar');
+        }
+      });
+
+      const trackItems = document.querySelectorAll('.trackItem');
+      trackItems.forEach((item, index) => {
+        const track = tracks[index];
+        if (translations[track.name] && lang === 'en') {
+          item.textContent = translations[track.name];
+        } else {
+          item.textContent = track.name;
+        }
+      });
+
+      const selectOptions = document.querySelectorAll('#readerSelect option');
+      selectOptions.forEach(option => {
+        const key = option.getAttribute('data-translate');
+        if (translations[key] && lang === 'en') {
+          option.textContent = translations[key];
+        } else {
+          option.textContent = option.getAttribute('data-ar');
+        }
+      });
+
+      // Update the "Now Playing" section
+      const currentTrackDiv = document.getElementById("currentTrack");
+      if (currentTrackDiv.textContent.includes("تستمعون الى:") || currentTrackDiv.textContent.includes("You are listening to:")) {
+        const trackName = currentTrackDiv.textContent.split(":")[1].trim();
+        const nowPlayingText = lang === 'en' ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
+        currentTrackDiv.textContent = `${nowPlayingText} ${translations[trackName] || trackName}`;
+      }
+    }
+
+    const languageSelect = document.getElementById('languageSelect');
+
+    languageSelect.addEventListener('change', async (event) => {
+      const selectedLanguage = event.target.value;
+      if (selectedLanguage !== localStorage.getItem('language')) {
+        localStorage.setItem('language', selectedLanguage);
+        window.location.reload(); // Refresh the page
+      }
+    });
+
+    function calculateTrackToPlay() {
+      const now = new Date();
+      const button = document.getElementById('playButton');
+      button.textContent = translations['جاري التجهيز...'] || 'جاري التجهيز...';
+
+      if (!isTracksReady || tracks.length === 0) {
+        console.error('Tracks not ready or empty');
+        alert('Please wait for tracks to load');
+        button.textContent = translations['تشغيل كبث قرآني'] || 'تشغيل كبث قرآني';
+        return;
+      }
+
+      const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
+      const elapsedSeconds = Math.floor((now - scheduledDateTime) / 1000);
+
+      console.log('Total duration:', totalDuration, 'Elapsed seconds:', elapsedSeconds);
+
+      // Calculate position in current cycle
+      let remainingTime = elapsedSeconds % totalDuration;
+      let accumulatedTime = 0;
+
+      // Find correct track and starting point
+      for (let i = 0; i < tracks.length; i++) {
         const track = tracks[i];
         accumulatedTime += track.duration;
 
         if (remainingTime < accumulatedTime) {
-            const trackOffset = remainingTime - (accumulatedTime - track.duration);
-            currentTrackIndex = i;
-            
-            console.log(`Playing track ${i} (${track.name}) from ${trackOffset}s`);
-            
-            setTimeout(() => {
-                playTrack(i, trackOffset);
-                button.textContent = 'تشغيل كبث قرآني';
-            }, 1000);
-            return;
+          const trackOffset = remainingTime - (accumulatedTime - track.duration);
+          currentTrackIndex = i;
+
+          console.log(`Playing track ${i} (${track.name}) from ${trackOffset}s`);
+
+          setTimeout(() => {
+            playTrack(i, trackOffset);
+            button.textContent = translations['تشغيل كبث قرآني'] || 'تشغيل كبث قرآني';
+          }, 1000);
+          return;
         }
+      }
+
+      // Fallback to first track if calculation fails
+      setTimeout(() => {
+        playTrack(0, 0);
+        button.textContent = translations['تشغيل كبث قرآني'] || 'تشغيل كبث قرآني';
+      }, 1000);
     }
 
-    // Fallback to first track if calculation fails
-    setTimeout(() => {
-        playTrack(0, 0);
-        button.textContent = 'تشغيل كبث قرآني';
-    }, 1000);
-}
+    function playTrack(index, startTime = 0, isRandom = false) {
+      const audioPlayer = document.getElementById("audioPlayer");
+      const currentTrackDiv = document.getElementById("currentTrack");
 
-        function playTrack(index, startTime = 0, isRandom = false) {
-            const audioPlayer = document.getElementById("audioPlayer");
-            const currentTrackDiv = document.getElementById("currentTrack");
+      if (!tracks[index]) {
+        console.error(`Invalid track index: ${index}`);
+        return;
+      }
 
-            if (!tracks[index]) {
-                console.error(`Invalid track index: ${index}`);
-                return;
-            }
+      const track = tracks[index];
+      console.log(`Playing track: ${track.name} from ${startTime}s (Random: ${isRandom})`);
 
-            const track = tracks[index];
-            console.log(`Playing track: ${track.name} from ${startTime}s (Random: ${isRandom})`);
-            
-            audioPlayer.src = track.url;
-            currentTrackDiv.textContent = `Now Playing: ${track.name}`;
+      audioPlayer.src = track.url;
 
-            // Highlight the active track in the track list
-            const trackItems = document.querySelectorAll('.trackItem');
-            trackItems.forEach((item, i) => {
-                item.classList.toggle('active', i === index);
+      // Use the new translation key for "تستمعون الى:" or "You are listening to:"
+      const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
+      currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
+
+      // Highlight the active track in the track list
+      const trackItems = document.querySelectorAll('.trackItem');
+      trackItems.forEach((item, i) => {
+        item.classList.toggle('active', i === index);
+      });
+
+      // Auto-scroll to the active track
+      const activeTrackItem = trackItems[index];
+      if (activeTrackItem) {
+        activeTrackItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      audioPlayer.onloadedmetadata = () => {
+        try {
+          audioPlayer.currentTime = startTime;
+          audioPlayer.play()
+            .catch(err => {
+              console.error("Playback error:", err);
+              alert("Error starting playback. Please click the play button.");
             });
-
-            // Auto-scroll to the active track
-            const activeTrackItem = trackItems[index];
-            if (activeTrackItem) {
-                activeTrackItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-
-            audioPlayer.onloadedmetadata = () => {
-                try {
-                    audioPlayer.currentTime = startTime;
-                    audioPlayer.play()
-                        .catch(err => {
-                            console.error("Playback error:", err);
-                            alert("Error starting playback. Please click the play button.");
-                        });
-                } catch (e) {
-                    console.error("Error setting current time:", e);
-                }
-            };
-
-            audioPlayer.onended = () => {
-                currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-                playTrack(currentTrackIndex, 0, isRandom);
-            };
-
-            audioPlayer.onerror = (e) => {
-                console.error("Audio error:", e);
-                currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-                playTrack(currentTrackIndex, 0, isRandom);
-            };
+        } catch (e) {
+          console.error("Error setting current time:", e);
         }
+      };
 
-        async function loadSelectedReader() {
-            const select = document.getElementById('readerSelect');
-            currentReader = select.value;
-            console.log(`Loading reader: ${currentReader}`);
-            
-            select.disabled = true;
-            isTracksReady = false;
-            tracks = [];
-            
-            // Stop the current audio playback
-            const audioPlayer = document.getElementById('audioPlayer');
-            audioPlayer.pause();
-            audioPlayer.src = '';
-            
-            const success = await loadTracks(m3uLinks[currentReader]);
-            select.disabled = false;
-            
-            if (success) {
-                console.log(`Successfully loaded ${tracks.length} tracks for ${currentReader}`);
-                // Automatically start playing from the scheduled time for the new reader
-                if (isPlaying) { // Only autoplay if audio was already playing
-                    calculateTrackToPlay();
-                }
-            }
+      audioPlayer.onended = () => {
+        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+        playTrack(currentTrackIndex, 0, isRandom);
+      };
+
+      audioPlayer.onerror = (e) => {
+        console.error("Audio error:", e);
+        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+        playTrack(currentTrackIndex, 0, isRandom);
+      };
+    }
+
+    async function loadSelectedReader() {
+      const select = document.getElementById('readerSelect');
+      currentReader = select.value;
+      select.disabled = true;
+      isTracksReady = false;
+      tracks = [];
+
+      const audioPlayer = document.getElementById('audioPlayer');
+      audioPlayer.pause();
+      audioPlayer.src = '';
+
+      const success = await loadTracks(m3uLinks[currentReader]);
+      select.disabled = false;
+
+      if (success) {
+        if (isPlaying) {
+          calculateTrackToPlay();
         }
+      }
+    }
 
-        // Track if audio is playing
-        const audioPlayer = document.getElementById('audioPlayer');
-        audioPlayer.addEventListener('play', () => {
-            isPlaying = true;
-        });
+    window.onload = async () => {
+      console.log('Page loaded, initializing player...');
+      loadSelectedReader();
 
-        audioPlayer.addEventListener('pause', () => {
-            isPlaying = false;
-        });
+      // Set the selected language in the dropdown
+      const languageSelect = document.getElementById('languageSelect');
+      const savedLanguage = localStorage.getItem('language') || 'ar';
+      languageSelect.value = savedLanguage;
 
-        window.onload = () => {
-            console.log('Page loaded, initializing player...');
-            loadSelectedReader();
-        };
-    </script>
+      // Restore language preference
+      if (savedLanguage === 'en') {
+        await loadTranslations();
+        translateUI('en');
+      } else {
+        translateUI('ar');
+      }
+    };
+  </script>
 </body>
 </html>
