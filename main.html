@@ -44,18 +44,19 @@
 
     /* Modern Dark Theme with Sleek Design */
     body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #1a1a1a;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  color: #fff;
-  flex-direction: column;
-  background: radial-gradient(circle, #2c3e50, #1a1a1a);
-  padding: 40px 0; /* Added space at the top and bottom */
-}
+      font-family: 'Poppins', sans-serif;
+      background-color: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #fff;
+      flex-direction: column;
+      background: radial-gradient(circle, #2c3e50, #1a1a1a);
+      padding: 40px 0;
+      overflow: hidden;
+    }
 
     h1 {
       color: #fff;
@@ -64,7 +65,7 @@
       font-weight: 700;
       text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
       letter-spacing: 1px;
-      margin-top: 60px; /* Added more space at the top to avoid overlap */
+      margin-top: 60px;
     }
 
     audio {
@@ -147,9 +148,48 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  margin: 20px 0; /* Added margin to the top and bottom of the container */
+  position: fixed;
+  top: 50%;
+  left: 50%; /* Start at the center */
+  transform: translate(-50%, -50%); /* Center alignment */
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  opacity: 1; /* Fully visible */
 }
+
+.container.active {
+  transform: translate(-150%, -50%); /* Move out to the left */
+  opacity: 0; /* Optional: Fade out */
+}
+
+.container2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 40px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: 50%;
+  left: 150%; /* Start off-screen to the right */
+  transform: translate(-50%, -50%);
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  opacity: 0; /* Hidden initially */
+}
+
+.container2.active {
+  left: 50%; /* Move to the center */
+  transform: translate(-50%, -50%);
+  opacity: 1; /* Fully visible */
+}
+
+
 
     select {
       padding: 10px;
@@ -250,9 +290,9 @@
 
     /* Language Select Dropdown */
     .language-select {
-      position: absolute; /* Position the dropdown in the corner */
-      top: 20px; /* Distance from the top */
-      right: 20px; /* Distance from the right */
+      position: absolute;
+      top: 20px;
+      right: 20px;
     }
 
     .language-select select {
@@ -268,7 +308,6 @@
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
-      /* Remove the arrow */
       background-image: none;
     }
 
@@ -286,82 +325,115 @@
     /* Responsive Design */
     @media (max-width: 768px) {
       h1 {
-        font-size: 1.8rem; /* Smaller font size for smaller screens */
-        margin-top: 80px; /* Add more space at the top to avoid overlap */
-        text-align: center; /* Center the app name */
+        font-size: 1.8rem;
+        margin-top: 80px;
+        text-align: center;
       }
 
       .container {
-        padding: 20px; /* Reduce padding for smaller screens */
-        width: 95%; /* Increase width for better use of space */
+        padding: 20px;
+        width: 95%;
       }
 
       select {
-        font-size: 0.9rem; /* Smaller font size for dropdowns */
-        max-width: 100%; /* Full width for dropdowns */
+        font-size: 0.9rem;
+        max-width: 100%;
       }
 
       button {
-        width: 100%; /* Full width for buttons */
-        padding: 15px; /* Slightly larger padding for easier tapping */
-        font-size: 1rem; /* Smaller font size for buttons */
+        width: 100%;
+        padding: 15px;
+        font-size: 1rem;
       }
 
       #currentTrack {
-        font-size: 1rem; /* Smaller font size for current track */
-        padding: 10px 15px; /* Adjust padding */
+        font-size: 1rem;
+        padding: 10px 15px;
       }
 
       .language-select {
-        top: 10px; /* Move the language dropdown closer to the top */
-        right: 10px; /* Move the language dropdown closer to the right */
+        top: 10px;
+        right: 10px;
       }
 
       audio {
-        max-width: 100%; /* Full width for audio player */
+        max-width: 100%;
       }
 
       #trackList {
-        max-height: 150px; /* Reduce max height for track list */
+        max-height: 150px;
       }
     }
 
     @media (max-width: 480px) {
       h1 {
-        font-size: 1.5rem; /* Even smaller font size for very small screens */
-        margin-top: 90px; /* Add more space at the top */
+        font-size: 1.5rem;
+        margin-top: 90px;
       }
 
       .container {
-        padding: 15px; /* Further reduce padding */
+        padding: 15px;
       }
 
       select {
-        font-size: 0.8rem; /* Smaller font size for dropdowns */
+        font-size: 0.8rem;
       }
 
       button {
-        font-size: 0.9rem; /* Smaller font size for buttons */
+        font-size: 0.9rem;
       }
 
       #currentTrack {
-        font-size: 0.9rem; /* Smaller font size for current track */
+        font-size: 0.9rem;
       }
 
       .language-select select {
-        font-size: 0.9rem; /* Smaller font size for language select */
-        padding: 8px; /* Reduce padding for smaller screens */
+        font-size: 0.9rem;
+        padding: 8px;
       }
 
       .language-select {
-        top: 5px; /* Move the language dropdown even closer to the top */
-        right: 5px; /* Move the language dropdown even closer to the right */
+        top: 5px;
+        right: 5px;
       }
+    }
+
+    /* Circle Container */
+    .circle-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    /* Circle Styling */
+    .circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Active Circle Styling */
+    .circle.active {
+      background-color: #4CAF50;
+      transform: scale(1.2);
+    }
+
+    /* Hover Effect */
+    .circle:hover {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Specific style for the second circle in the second container */
+    #secondContainer .circle-container .circle:nth-child(2) {
+      background-color: #4CAF50;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="mainContainer">
     <h1 data-translate="البرنامج القرآني" data-ar="البرنامج القرآني">البرنامج القرآني</h1>
     
     <!-- Language Select Dropdown -->
@@ -402,304 +474,337 @@
     <div id="currentTrack" data-translate="لاتوجد وسائط قيد التشغيل" data-ar="لاتوجد وسائط قيد التشغيل">لاتوجد وسائط قيد التشغيل</div>
     <div id="loadingSpinner">جاري التجهيز...</div>
     <div id="trackList"></div>
+
+    <!-- Circle Container -->
+    <div class="circle-container">
+      <div class="circle active" onclick="toggleCircle(1)"></div>
+      <div class="circle" onclick="toggleCircle(2)"></div>
+    </div>
+  </div>
+
+  <!-- Second Container -->
+  <div class="container2" id="secondContainer">
+    <h1>Second Container</h1>
+    <p>This is the second container.</p>
+    
+    <!-- Circle Container for Second Container -->
+    <div class="circle-container">
+      <div class="circle active" onclick="toggleCircle(1)"></div>
+      <div class="circle" onclick="toggleCircle(2)"></div>
+    </div>
   </div>
 
   <script>
-   const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
-const m3uLinks = {
-  random: "https://www.streamadqfm.store/nmsC.m3u",
-  exclusive: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%AD%D8%B5%D8%B1%D9%8A.m3u",
-  tobalawi: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%B7%D8%A8%D9%84%D8%A7%D9%88%D9%8A.m3u",
-  manshawi: "https://www.streamadqfm.store/%D8%A7%D9%84%D9%85%D9%86%D8%B4%D8%A7%D9%88%D9%8A.m3u",
-  abdbasat: "https://www.streamadqfm.store/%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7.m3u",
-  mahmoudbanna: "https://www.streamadqfm.store/%D9%85%D8%AD%D9%85%D9%88%D8%AF%20%D8%A7%D9%84%D8%A8%D9%86%D8%A7.m3u"
-};
+    const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
+    const m3uLinks = {
+      random: "https://www.streamadqfm.store/nmsC.m3u",
+      exclusive: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%AD%D8%B5%D8%B1%D9%8A.m3u",
+      tobalawi: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%B7%D8%A8%D9%84%D8%A7%D9%88%D9%8A.m3u",
+      manshawi: "https://www.streamadqfm.store/%D8%A7%D9%84%D9%85%D9%86%D8%B4%D8%A7%D9%88%D9%8A.m3u",
+      abdbasat: "https://www.streamadqfm.store/%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7.m3u",
+      mahmoudbanna: "https://www.streamadqfm.store/%D9%85%D8%AD%D9%85%D9%88%D8%AF%20%D8%A7%D9%84%D8%A8%D9%86%D8%A7.m3u"
+    };
 
-const translationFiles = {
-  en: "https://www.streamadqfm.store/translated/en/main.json", // English translations
-  de: "https://www.streamadqfm.store/translated/en/translation_de.json",
-  fr: "https://www.streamadqfm.store/translated/en/translation_fr.json",
-  hi: "https://www.streamadqfm.store/translated/en/translation_hi.json",
-  id: "https://www.streamadqfm.store/translated/en/translation_id.json",
-  it: "https://www.streamadqfm.store/translated/en/translation_it.json",
-  ja: "https://www.streamadqfm.store/translated/en/translation_ja.json",
-  ko: "https://www.streamadqfm.store/translated/en/translation_ko.json",
-  nl: "https://www.streamadqfm.store/translated/en/translation_nl.json",
-  pt: "https://www.streamadqfm.store/translated/en/translation_pt.json",
-  ru: "https://www.streamadqfm.store/translated/en/translation_ru.json",
-  sw: "https://www.streamadqfm.store/translated/en/translation_sw.json",
-  tr: "https://www.streamadqfm.store/translated/en/translation_tr.json",
-  zh: "https://www.streamadqfm.store/translated/en/translation_zh-cn.json"
-};
+    const translationFiles = {
+      en: "https://www.streamadqfm.store/translated/en/main.json",
+      de: "https://www.streamadqfm.store/translated/en/translation_de.json",
+      fr: "https://www.streamadqfm.store/translated/en/translation_fr.json",
+      hi: "https://www.streamadqfm.store/translated/en/translation_hi.json",
+      id: "https://www.streamadqfm.store/translated/en/translation_id.json",
+      it: "https://www.streamadqfm.store/translated/en/translation_it.json",
+      ja: "https://www.streamadqfm.store/translated/en/translation_ja.json",
+      ko: "https://www.streamadqfm.store/translated/en/translation_ko.json",
+      nl: "https://www.streamadqfm.store/translated/en/translation_nl.json",
+      pt: "https://www.streamadqfm.store/translated/en/translation_pt.json",
+      ru: "https://www.streamadqfm.store/translated/en/translation_ru.json",
+      sw: "https://www.streamadqfm.store/translated/en/translation_sw.json",
+      tr: "https://www.streamadqfm.store/translated/en/translation_tr.json",
+      zh: "https://www.streamadqfm.store/translated/en/translation_zh-cn.json"
+    };
 
-let tracks = [];
-let isTracksReady = false;
-let currentTrackIndex = 0;
-let currentReader = '';
-let isPlaying = false;
-let translations = {};
-let isTranslated = false;
+    let tracks = [];
+    let isTracksReady = false;
+    let currentTrackIndex = 0;
+    let currentReader = '';
+    let isPlaying = false;
+    let translations = {};
+    let isTranslated = false;
 
-// Load language preference from localStorage
-const savedLanguage = localStorage.getItem('language') || 'ar';
-isTranslated = savedLanguage !== 'ar';
+    // Load language preference from localStorage
+    const savedLanguage = localStorage.getItem('language') || 'ar';
+    isTranslated = savedLanguage !== 'ar';
 
-async function loadTracks(url) {
-  const spinner = document.getElementById('loadingSpinner');
-  spinner.style.display = 'block';
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    const text = await response.text();
-    const lines = text.split("\n").filter(line => line.trim() !== "");
-    tracks = [];
-    let tempTrack = null;
-    for (const line of lines) {
-      if (line.startsWith("#EXTINF:")) {
-        const parts = line.slice(8).split(",");
-        const duration = Math.max(parseFloat(parts[0]) || 1800, 0);
-        const name = parts[1]?.trim() || "Unknown Track";
-        tempTrack = { duration, name };
-      } else if (tempTrack && !line.startsWith("#")) {
-        tempTrack.url = line.trim();
-        tracks.push(tempTrack);
-        tempTrack = null;
+    async function loadTracks(url) {
+      const spinner = document.getElementById('loadingSpinner');
+      spinner.style.display = 'block';
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const text = await response.text();
+        const lines = text.split("\n").filter(line => line.trim() !== "");
+        tracks = [];
+        let tempTrack = null;
+        for (const line of lines) {
+          if (line.startsWith("#EXTINF:")) {
+            const parts = line.slice(8).split(",");
+            const duration = Math.max(parseFloat(parts[0]) || 1800, 0);
+            const name = parts[1]?.trim() || "Unknown Track";
+            tempTrack = { duration, name };
+          } else if (tempTrack && !line.startsWith("#")) {
+            tempTrack.url = line.trim();
+            tracks.push(tempTrack);
+            tempTrack = null;
+          }
+        }
+        isTracksReady = tracks.length > 0;
+        displayTrackList();
+        return true;
+      } catch (error) {
+        console.error('Error in loadTracks:', error);
+        isTracksReady = false;
+        tracks = [];
+        alert(`Failed to load tracks: ${error.message}`);
+        return false;
+      } finally {
+        spinner.style.display = 'none';
       }
     }
-    isTracksReady = tracks.length > 0;
-    displayTrackList();
-    return true;
-  } catch (error) {
-    console.error('Error in loadTracks:', error);
-    isTracksReady = false;
-    tracks = [];
-    alert(`Failed to load tracks: ${error.message}`);
-    return false;
-  } finally {
-    spinner.style.display = 'none';
-  }
-}
 
-function displayTrackList() {
-  const trackListDiv = document.getElementById('trackList');
-  trackListDiv.innerHTML = tracks.map((track, index) => `
-    <div class="trackItem ${index === currentTrackIndex ? 'active' : ''}" onclick="playTrack(${index})">
-      ${translations[track.name] || track.name}
-    </div>
-  `).join('');
-}
-
-async function loadTranslations(lang = 'en') {
-  const url = `${translationFiles[lang]}?v=${new Date().getTime()}`; // Cache-busting
-  if (!url) {
-    console.error(`Translation file for language '${lang}' not found.`);
-    return;
-  }
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    translations = await response.json();
-    console.log(`Translations loaded for language: ${lang}`, translations);
-  } catch (error) {
-    console.error(`Error loading translations for language '${lang}':`, error);
-    translations = {};
-  }
-}
-
-function translateUI(lang = 'ar') {
-  console.log("Translations:", translations); // Debugging
-  console.log("Track Names:", tracks.map(track => track.name)); // Debugging
-
-  const elementsToTranslate = document.querySelectorAll('[data-translate]');
-  elementsToTranslate.forEach(element => {
-    const key = element.getAttribute('data-translate');
-    if (translations[key] && lang !== 'ar') {
-      element.textContent = translations[key];
-    } else {
-      element.textContent = element.getAttribute('data-ar');
+    function displayTrackList() {
+      const trackListDiv = document.getElementById('trackList');
+      trackListDiv.innerHTML = tracks.map((track, index) => `
+        <div class="trackItem ${index === currentTrackIndex ? 'active' : ''}" onclick="playTrack(${index})">
+          ${translations[track.name] || track.name}
+        </div>
+      `).join('');
     }
-  });
 
-  const trackItems = document.querySelectorAll('.trackItem');
-  trackItems.forEach((item, index) => {
-    const track = tracks[index];
-    if (translations[track.name] && lang !== 'ar') {
-      item.textContent = translations[track.name];
-    } else {
-      item.textContent = track.name;
+    async function loadTranslations(lang = 'en') {
+      const url = `${translationFiles[lang]}?v=${new Date().getTime()}`;
+      if (!url) {
+        console.error(`Translation file for language '${lang}' not found.`);
+        return;
+      }
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        translations = await response.json();
+        console.log(`Translations loaded for language: ${lang}`, translations);
+      } catch (error) {
+        console.error(`Error loading translations for language '${lang}':`, error);
+        translations = {};
+      }
     }
-  });
 
-  const selectOptions = document.querySelectorAll('#readerSelect option');
-  selectOptions.forEach(option => {
-    const key = option.getAttribute('data-translate');
-    if (translations[key] && lang !== 'ar') {
-      option.textContent = translations[key];
-    } else {
-      option.textContent = option.getAttribute('data-ar');
+    function translateUI(lang = 'ar') {
+      console.log("Translations:", translations);
+      console.log("Track Names:", tracks.map(track => track.name));
+
+      const elementsToTranslate = document.querySelectorAll('[data-translate]');
+      elementsToTranslate.forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[key] && lang !== 'ar') {
+          element.textContent = translations[key];
+        } else {
+          element.textContent = element.getAttribute('data-ar');
+        }
+      });
+
+      const trackItems = document.querySelectorAll('.trackItem');
+      trackItems.forEach((item, index) => {
+        const track = tracks[index];
+        if (translations[track.name] && lang !== 'ar') {
+          item.textContent = translations[track.name];
+        } else {
+          item.textContent = track.name;
+        }
+      });
+
+      const selectOptions = document.querySelectorAll('#readerSelect option');
+      selectOptions.forEach(option => {
+        const key = option.getAttribute('data-translate');
+        if (translations[key] && lang !== 'ar') {
+          option.textContent = translations[key];
+        } else {
+          option.textContent = option.getAttribute('data-ar');
+        }
+      });
+
+      const currentTrackDiv = document.getElementById("currentTrack");
+      if (currentTrackDiv.textContent.includes("تستمعون الى:") || currentTrackDiv.textContent.includes("You are listening to:")) {
+        const trackName = currentTrackDiv.textContent.split(":")[1].trim();
+        const nowPlayingText = lang === 'ar' ? 'تستمعون الى:' : translations['تستمعون الى:'] || 'You are listening to:';
+        currentTrackDiv.textContent = `${nowPlayingText} ${translations[trackName] || trackName}`;
+      }
     }
-  });
 
-  // Update the "Now Playing" section
-  const currentTrackDiv = document.getElementById("currentTrack");
-  if (currentTrackDiv.textContent.includes("تستمعون الى:") || currentTrackDiv.textContent.includes("You are listening to:")) {
-    const trackName = currentTrackDiv.textContent.split(":")[1].trim();
-    const nowPlayingText = lang === 'ar' ? 'تستمعون الى:' : translations['تستمعون الى:'] || 'You are listening to:';
-    currentTrackDiv.textContent = `${nowPlayingText} ${translations[trackName] || trackName}`;
-  }
-}
+    const languageSelect = document.getElementById('languageSelect');
 
-const languageSelect = document.getElementById('languageSelect');
+    languageSelect.addEventListener('change', async (event) => {
+      const selectedLanguage = event.target.value;
+      if (selectedLanguage !== localStorage.getItem('language')) {
+        localStorage.setItem('language', selectedLanguage);
+        await loadTranslations(selectedLanguage);
+        translateUI(selectedLanguage);
+        window.location.reload();
+      }
+    });
 
-languageSelect.addEventListener('change', async (event) => {
-  const selectedLanguage = event.target.value;
-  if (selectedLanguage !== localStorage.getItem('language')) {
-    localStorage.setItem('language', selectedLanguage);
-    await loadTranslations(selectedLanguage);
-    translateUI(selectedLanguage);
-  }
-});
+    function calculateTrackToPlay() {
+      const now = new Date();
+      const button = document.getElementById('playButton');
+      button.textContent = translations['جاري التجهيز...'] || 'جاري التجهيز...';
 
-function calculateTrackToPlay() {
-  const now = new Date();
-  const button = document.getElementById('playButton');
-  button.textContent = translations['جاري التجهيز...'] || 'جاري التجهيز...';
+      if (!isTracksReady || tracks.length === 0) {
+        console.error('Tracks not ready or empty');
+        alert('Please wait for tracks to load');
+        button.textContent = translations['تشغيل كبث قرآني'] || 'تشغيل كبث قرآني';
+        return;
+      }
 
-  if (!isTracksReady || tracks.length === 0) {
-    console.error('Tracks not ready or empty');
-    alert('Please wait for tracks to load');
-    button.textContent = translations['تشغيل كبث قرآني'] || 'تشغيل كبث قرآني';
-    return;
-  }
+      const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
+      const elapsedSeconds = Math.floor((now - scheduledDateTime) / 1000);
 
-  const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
-  const elapsedSeconds = Math.floor((now - scheduledDateTime) / 1000);
+      console.log('Total duration:', totalDuration, 'Elapsed seconds:', elapsedSeconds);
 
-  console.log('Total duration:', totalDuration, 'Elapsed seconds:', elapsedSeconds);
+      let remainingTime = elapsedSeconds % totalDuration;
+      let accumulatedTime = 0;
 
-  // Calculate position in current cycle
-  let remainingTime = elapsedSeconds % totalDuration;
-  let accumulatedTime = 0;
+      for (let i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+        accumulatedTime += track.duration;
 
-  // Find correct track and starting point
-  for (let i = 0; i < tracks.length; i++) {
-    const track = tracks[i];
-    accumulatedTime += track.duration;
+        if (remainingTime < accumulatedTime) {
+          const trackOffset = remainingTime - (accumulatedTime - track.duration);
+          currentTrackIndex = i;
 
-    if (remainingTime < accumulatedTime) {
-      const trackOffset = remainingTime - (accumulatedTime - track.duration);
-      currentTrackIndex = i;
+          console.log(`Playing track ${i} (${track.name}) from ${trackOffset}s`);
 
-      console.log(`Playing track ${i} (${track.name}) from ${trackOffset}s`);
+          setTimeout(() => {
+            playTrack(i, trackOffset);
+            button.textContent = translations['تشغيل كبث قرآني'] || 'تشغيل كبث قرآني';
+          }, 1000);
+          return;
+        }
+      }
 
       setTimeout(() => {
-        playTrack(i, trackOffset);
+        playTrack(0, 0);
         button.textContent = translations['تشغيل كبث قرآني'] || 'تشغيل كبث قرآني';
       }, 1000);
-      return;
     }
-  }
 
-  // Fallback to first track if calculation fails
-  setTimeout(() => {
-    playTrack(0, 0);
-    button.textContent = translations['تشغيل كبث قرآني'] || 'تشغيل كبث قرآني';
-  }, 1000);
-}
+    function playTrack(index, startTime = 0, isRandom = false) {
+      const audioPlayer = document.getElementById("audioPlayer");
+      const currentTrackDiv = document.getElementById("currentTrack");
 
-function playTrack(index, startTime = 0, isRandom = false) {
-  const audioPlayer = document.getElementById("audioPlayer");
-  const currentTrackDiv = document.getElementById("currentTrack");
+      if (!tracks[index]) {
+        console.error(`Invalid track index: ${index}`);
+        return;
+      }
 
-  if (!tracks[index]) {
-    console.error(`Invalid track index: ${index}`);
-    return;
-  }
+      const track = tracks[index];
+      console.log(`Playing track: ${track.name} from ${startTime}s (Random: ${isRandom})`);
 
-  const track = tracks[index];
-  console.log(`Playing track: ${track.name} from ${startTime}s (Random: ${isRandom})`);
+      audioPlayer.src = track.url;
 
-  audioPlayer.src = track.url;
+      const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
+      currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
 
-  // Use the new translation key for "تستمعون الى:" or "You are listening to:"
-  const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
-  currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
+      const trackItems = document.querySelectorAll('.trackItem');
+      trackItems.forEach((item, i) => {
+        item.classList.toggle('active', i === index);
+      });
 
-  // Highlight the active track in the track list
-  const trackItems = document.querySelectorAll('.trackItem');
-  trackItems.forEach((item, i) => {
-    item.classList.toggle('active', i === index);
-  });
+      const activeTrackItem = trackItems[index];
+      if (activeTrackItem) {
+        activeTrackItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
 
-  // Auto-scroll to the active track
-  const activeTrackItem = trackItems[index];
-  if (activeTrackItem) {
-    activeTrackItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
+      audioPlayer.onloadedmetadata = () => {
+        try {
+          audioPlayer.currentTime = startTime;
+          audioPlayer.play()
+            .catch(err => {
+              console.error("Playback error:", err);
+              alert("Error starting playback. Please click the play button.");
+            });
+        } catch (e) {
+          console.error("Error setting current time:", e);
+        }
+      };
 
-  audioPlayer.onloadedmetadata = () => {
-    try {
-      audioPlayer.currentTime = startTime;
-      audioPlayer.play()
-        .catch(err => {
-          console.error("Playback error:", err);
-          alert("Error starting playback. Please click the play button.");
-        });
-    } catch (e) {
-      console.error("Error setting current time:", e);
+      audioPlayer.onended = () => {
+        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+        playTrack(currentTrackIndex, 0, isRandom);
+      };
+
+      audioPlayer.onerror = (e) => {
+        console.error("Audio error:", e);
+        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+        playTrack(currentTrackIndex, 0, isRandom);
+      };
     }
-  };
 
-  audioPlayer.onended = () => {
-    currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-    playTrack(currentTrackIndex, 0, isRandom);
-  };
+    async function loadSelectedReader() {
+      const select = document.getElementById('readerSelect');
+      currentReader = select.value;
+      select.disabled = true;
+      isTracksReady = false;
+      tracks = [];
 
-  audioPlayer.onerror = (e) => {
-    console.error("Audio error:", e);
-    currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-    playTrack(currentTrackIndex, 0, isRandom);
-  };
-}
+      const audioPlayer = document.getElementById('audioPlayer');
+      audioPlayer.pause();
+      audioPlayer.src = '';
 
-async function loadSelectedReader() {
-  const select = document.getElementById('readerSelect');
-  currentReader = select.value;
-  select.disabled = true;
-  isTracksReady = false;
-  tracks = [];
+      const success = await loadTracks(m3uLinks[currentReader]);
+      select.disabled = false;
 
-  const audioPlayer = document.getElementById('audioPlayer');
-  audioPlayer.pause();
-  audioPlayer.src = '';
-
-  const success = await loadTracks(m3uLinks[currentReader]);
-  select.disabled = false;
-
-  if (success) {
-    if (isPlaying) {
-      calculateTrackToPlay();
+      if (success) {
+        if (isPlaying) {
+          calculateTrackToPlay();
+        }
+      }
     }
-  }
-}
 
-window.onload = async () => {
-  console.log('Page loaded, initializing player...');
-  loadSelectedReader();
+    // Circle Toggle Functionality
+    function toggleCircle(circleNumber) {
+  const mainContainer = document.getElementById('mainContainer');
+  const secondContainer = document.getElementById('secondContainer');
+  const circles = document.querySelectorAll('.circle');
 
-  // Set the selected language in the dropdown
-  const languageSelect = document.getElementById('languageSelect');
-  const savedLanguage = localStorage.getItem('language') || 'ar';
-  languageSelect.value = savedLanguage;
-
-  // Restore language preference
-  if (savedLanguage !== 'ar') {
-    await loadTranslations(savedLanguage);
-    translateUI(savedLanguage);
+  if (circleNumber === 2) {
+    // Show container2 and hide container
+    mainContainer.classList.add('active'); // Slide container to the left
+    secondContainer.classList.add('active'); // Bring container2 from the right
   } else {
-    translateUI('ar');
+    // Show container and hide container2
+    mainContainer.classList.remove('active'); // Bring container back to the center
+    secondContainer.classList.remove('active'); // Slide container2 to the right
   }
-};
+
+  // Update active state for circles
+  circles.forEach(circle => circle.classList.remove('active'));
+  const selectedCircle = document.querySelector(`.circle:nth-child(${circleNumber})`);
+  selectedCircle.classList.add('active');
+}
+
+
+    window.onload = async () => {
+      console.log('Page loaded, initializing player...');
+      loadSelectedReader();
+
+      const languageSelect = document.getElementById('languageSelect');
+      const savedLanguage = localStorage.getItem('language') || 'ar';
+      languageSelect.value = savedLanguage;
+
+      if (savedLanguage !== 'ar') {
+        await loadTranslations(savedLanguage);
+        translateUI(savedLanguage);
+      } else {
+        translateUI('ar');
+      }
+    };
   </script>
 </body>
 </html>
