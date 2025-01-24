@@ -54,7 +54,7 @@
       color: #fff;
       flex-direction: column;
       background: radial-gradient(circle, #2c3e50, #1a1a1a);
-      padding: 40px 0;
+      padding: 60px 0;
       overflow: hidden;
     }
 
@@ -179,7 +179,7 @@
   top: 50%;
   left: 150%; /* Start off-screen to the right */
   transform: translate(-50%, -50%);
-  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out, left 0.5s ease-in-out;
   opacity: 0; /* Hidden initially */
 }
 
@@ -430,6 +430,136 @@
     #secondContainer .circle-container .circle:nth-child(2) {
       background-color: #4CAF50;
     }
+	
+	.about-content {
+  max-width: 800px;
+  text-align: right;
+  padding: 20px;
+  line-height: 1.6;
+  color: #fff;
+  overflow-y: auto;
+  max-height: 70vh;
+  margin-top: 0; /* Remove any top margin */
+}
+
+.about-content h1 {
+  margin-top: 0; /* Ensure no top margin */
+  margin-bottom: 20px;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px solid #4CAF50;
+  padding-bottom: 10px;
+}
+
+.about-content h2 {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  color: #4CAF50;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.about-text {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.about-text p {
+  margin-bottom: 15px;
+}
+
+.about-text ul {
+  list-style-type: none;
+  padding-right: 20px;
+}
+
+.about-text ul li {
+  margin-bottom: 15px;
+  position: relative;
+  padding-right: 25px;
+}
+
+.about-text ul li::before {
+  content: '•';
+  color: #4CAF50;
+  font-weight: bold;
+  font-size: 1.5rem;
+  position: absolute;
+  right: 0;
+  top: -2px;
+}
+
+.about-text ul li strong {
+  color: #4CAF50;
+  margin-right: 10px;
+}
+
+.about-text a {
+  color: #4CAF50;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.about-text a:hover {
+  color: #45a049;
+}
+
+/* Scrollbar Styling */
+.about-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.about-content::-webkit-scrollbar-thumb {
+  background-color: #4CAF50;
+  border-radius: 4px;
+}
+
+.about-content::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .about-content {
+    padding: 10px;
+    max-height: 65vh;
+  }
+
+  .about-content h1 {
+    font-size: 1.6rem;
+  }
+
+  .about-content h2 {
+    font-size: 1.2rem;
+  }
+
+  .about-text {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-content {
+    padding: 5px;
+    max-height: 60vh;
+  }
+
+  .about-content h1 {
+    font-size: 1.4rem;
+  }
+
+  .about-content h2 {
+    font-size: 1rem;
+  }
+
+  .about-text {
+    padding: 10px;
+  }
+}
   </style>
 </head>
 <body>
@@ -484,8 +614,23 @@
 
   <!-- Second Container -->
   <div class="container2" id="secondContainer">
-    <h1>Second Container</h1>
-    <p>This is the second container.</p>
+    <div class="about-content">
+      <h1 data-translate="about_title" data-ar="عن الإذاعة">عن الإذاعة</h1>
+      <div class="about-text">
+        <p data-translate="about_welcome" data-ar="نرحب بكم في إذاعة على ضفاف القرآن، وجهتك المفضلة للاستماع إلى القرآن الكريم برواية حفص عن عاصم. نسعى جاهدين لتوفير تجربة استماع فريدة ومريحة لجميع محبي القرآن.">نرحب بكم في إذاعة على ضفاف القرآن، وجهتك المفضلة للاستماع إلى القرآن الكريم برواية حفص عن عاصم. نسعى جاهدين لتوفير تجربة استماع فريدة ومريحة لجميع محبي القرآن.</p>
+        
+        <h2 data-translate="about_features" data-ar="ما يميزنا:">ما يميزنا:</h2>
+        <ul>
+          <li><strong data-translate="about_feature1" data-ar="تنوع القراء والسور:">تنوع القراء والسور:</strong> <span data-translate="about_feature1_desc" data-ar="نقدم لك مجموعة واسعة من القراء المتميزين، ويمكنك اختيار السورة التي ترغب في الاستماع إليها بحرية تامة.">نقدم لك مجموعة واسعة من القراء المتميزين، ويمكنك اختيار السورة التي ترغب في الاستماع إليها بحرية تامة.</span></li>
+          <li><strong data-translate="about_feature2" data-ar="الاستماع العشوائي:">الاستماع العشوائي:</strong> <span data-translate="about_feature2_desc" data-ar="استمتع بتجربة استماع جديدة في كل مرة، حيث يمكنك اختيار الاستماع العشوائي لقارئ معين.">استمتع بتجربة استماع جديدة في كل مرة، حيث يمكنك اختيار الاستماع العشوائي لقارئ معين.</span></li>
+          <li><strong data-translate="about_feature3" data-ar="التفسير الصوتي:">التفسير الصوتي:</strong> <span data-translate="about_feature3_desc" data-ar="إلى جانب التلاوات القرآنية، نقدم لك دروسًا تفسيرية صوتية باللغة العربية لتعميق فهمك ومعرفتك بالقرآن الكريم.">إلى جانب التلاوات القرآنية، نقدم لك دروسًا تفسيرية صوتية باللغة العربية لتعميق فهمك ومعرفتك بالقرآن الكريم.</span></li>
+          <li><strong data-translate="about_feature4" data-ar="البث المباشر:">البث المباشر:</strong> <span data-translate="about_feature4_desc" data-ar="استمع إلى إذاعتنا على مدار الساعة عبر">استمع إلى إذاعتنا على مدار الساعة عبر</span> 
+            <a href="https://adqfm.net/" target="_blank" rel="noopener noreferrer" data-translate="about_website" data-ar="موقعنا الإلكتروني">موقعنا الإلكتروني</a> <span data-translate="about_or" data-ar="أو">أو</span> 
+            <span data-translate="about_download_app" data-ar="قم بتحميل تطبيقنا من">قم بتحميل تطبيقنا من</span> 
+            <a href="https://play.google.com/store/apps/details?id=com.adqfm.ARFM" target="_blank" rel="noopener noreferrer" onclick="openGooglePlay()" data-translate="about_google_play" data-ar="متجر جوجل بلاي">متجر جوجل بلاي</a>.</li>
+        </ul>
+      </div>
+    </div>
     
     <!-- Circle Container for Second Container -->
     <div class="circle-container">
@@ -769,26 +914,35 @@
 
     // Circle Toggle Functionality
     function toggleCircle(circleNumber) {
-  const mainContainer = document.getElementById('mainContainer');
-  const secondContainer = document.getElementById('secondContainer');
-  const circles = document.querySelectorAll('.circle');
+      const mainContainer = document.getElementById('mainContainer');
+      const secondContainer = document.getElementById('secondContainer');
+      const circles = document.querySelectorAll('.circle');
 
-  if (circleNumber === 2) {
-    // Show container2 and hide container
-    mainContainer.classList.add('active'); // Slide container to the left
-    secondContainer.classList.add('active'); // Bring container2 from the right
-  } else {
-    // Show container and hide container2
-    mainContainer.classList.remove('active'); // Bring container back to the center
-    secondContainer.classList.remove('active'); // Slide container2 to the right
-  }
+      if (circleNumber === 2) {
+        // Show container2 and hide container
+        mainContainer.classList.add('active'); // Slide container to the left
+        secondContainer.classList.add('active'); // Bring container2 from the right
+      } else {
+        // Show container and hide container2
+        mainContainer.classList.remove('active'); // Bring container back to the center
+        secondContainer.classList.remove('active'); // Slide container2 to the right
+      }
 
-  // Update active state for circles
-  circles.forEach(circle => circle.classList.remove('active'));
-  const selectedCircle = document.querySelector(`.circle:nth-child(${circleNumber})`);
-  selectedCircle.classList.add('active');
-}
+      // Update active state for circles
+      circles.forEach(circle => circle.classList.remove('active'));
+      const selectedCircle = document.querySelector(`.circle:nth-child(${circleNumber})`);
+      selectedCircle.classList.add('active');
+    }
 
+    function openGooglePlay() {
+      // Try to open directly in Google Play app
+      window.location.href = "market://details?id=com.adqfm.ARFM";
+      
+      // Fallback to web link if app can't be opened
+      setTimeout(() => {
+        window.open("https://play.google.com/store/apps/details?id=com.adqfm.ARFM", "_blank");
+      }, 500);
+    }
 
     window.onload = async () => {
       console.log('Page loaded, initializing player...');
