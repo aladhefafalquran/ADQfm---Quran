@@ -568,6 +568,41 @@
   direction: ltr;
 }
 
+
+/* RTL (Arabic) bullet points */
+[dir="rtl"] .about-text ul li::before {
+  content: '•';
+  color: #4CAF50;
+  font-weight: bold;
+  font-size: 1.5rem;
+  position: absolute;
+  right: 0;
+  top: -2px;
+}
+
+/* LTR (Other languages) bullet points */
+[dir="ltr"] .about-text ul li::before {
+  content: '•';
+  color: #4CAF50;
+  font-weight: bold;
+  font-size: 1.5rem;
+  position: absolute;
+  left: 0;
+  top: -2px;
+}
+
+/* Adjust padding for list items based on direction */
+[dir="rtl"] .about-text ul li {
+  padding-right: 25px;
+  padding-left: 0;
+}
+
+[dir="ltr"] .about-text ul li {
+  padding-left: 25px;
+  padding-right: 0;
+}
+
+
 /* Direction-based Text Alignment */
 
 [dir="rtl"] .about-text {
