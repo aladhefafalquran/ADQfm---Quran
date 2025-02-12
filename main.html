@@ -568,14 +568,23 @@
   direction: ltr;
 }
 
+/* Direction-based Text Alignment */
+
 [dir="rtl"] .about-text {
+
     text-align: right;
+
     direction: rtl;
+
 }
 
+
 [dir="ltr"] .about-text {
+
     text-align: left;
+
     direction: ltr;
+
 }
 
   </style>
@@ -808,11 +817,11 @@ function translateUI(lang = 'ar') {
   const aboutText = document.querySelector('.about-text');
   if (aboutText) {
     if (lang === 'ar') {
-      aboutText.classList.remove('ltr');
-      aboutText.classList.add('rtl');
+      aboutText.style.textAlign = 'right';
+      document.documentElement.dir = 'rtl';
     } else {
-      aboutText.classList.remove('rtl');
-      aboutText.classList.add('ltr');
+      aboutText.style.textAlign = 'left';
+      document.documentElement.dir = 'ltr';
     }
   }
 }
