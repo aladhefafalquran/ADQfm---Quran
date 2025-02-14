@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=0.9">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
@@ -133,6 +133,18 @@
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
+
+    #readerSelect, #languageSelect {
+            text-align: center; /* Center the text within the select element */
+            /* Add any other necessary styles, like width, etc. */
+            width: fit-content; /* or a specific width */
+            margin: 0 auto; /* to center the select element itself if needed*/
+            display: block; /* if you want to use margin: 0 auto; */
+        }
+
+        #readerSelect option, #languageSelect option {
+           text-align: center; /* center text in options too */
+        }
 
   
     .container {
@@ -432,15 +444,27 @@
       background-color: #4CAF50;
     }
 	
-	.about-content {
-  max-width: 800px;
-  text-align: right;
-  padding: 20px;
-  line-height: 1.6;
-  color: #fff;
-  overflow-y: auto;
-  max-height: 70vh;
-  margin-top: 0; /* Remove any top margin */
+    .about-content {
+    /* ... other styles ... */
+    overflow-y: auto;
+    max-height: 70vh; /* Or a suitable height */
+}
+
+/* Styles for larger screens (optional - if you have specific desktop styles) */
+@media (min-width: 768px) { /* Adjust breakpoint as needed */
+    .about-content::-webkit-scrollbar {
+        width: 0.5em;
+    }
+}
+
+/* Styles for mobile screens */
+@media (max-width: 767px) { /* Adjust breakpoint as needed */
+    .about-content {
+        max-height: 70vh; /* Or a fixed pixel height */
+    }
+    .about-content::-webkit-scrollbar {
+        width: 0px; /* Hide scrollbar on mobile */
+    }
 }
 
 .about-content h1 {
@@ -632,22 +656,22 @@
     <!-- Language Select Dropdown -->
     <div class="language-select">
       <select id="languageSelect">
-        <option value="ar">العربية</option>
-        <option value="en">English</option>
-        <option value="tr">Türkçe</option>
-        <option value="de">Deutsch</option>
-        <option value="fr">Français</option>
-        <option value="hi">हिन्दी</option>
-        <option value="id">Bahasa Indonesia</option>
-        <option value="it">Italiano</option>
-        <option value="ja">日本語</option>
-        <option value="ko">한국어</option>
-        <option value="nl">Nederlands</option>
-        <option value="pt">Português</option>
-        <option value="ru">Русский</option>
-        <option value="sw">Kiswahili</option>
-        <option value="zh">中文 (简体)</option>
-      </select>
+        <option value="ar">العربية - AR</option>
+        <option value="en">English - EN</option>
+        <option value="tr">Türkçe - TR</option>
+        <option value="de">Deutsch - DE</option>
+        <option value="fr">Français - FR</option>
+        <option value="hi">हिन्दी - HI</option>
+        <option value="id">Bahasa Indonesia - ID</option>
+        <option value="it">Italiano - IT</option>
+        <option value="ja">日本語 - JA</option>
+        <option value="ko">한국어 - KO</option>
+        <option value="nl">Nederlands - NL</option>
+        <option value="pt">Português - PT</option>
+        <option value="ru">Русский - RU</option>
+        <option value="sw">Kiswahili - SW</option>
+        <option value="zh">中文 (简体) - ZH</option>
+    </select>
     </div>
 
     <select id="readerSelect" onchange="loadSelectedReader()">
