@@ -1098,5 +1098,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   </script>
+
+   <!-- Add WASM decoders for Apple devices -->
+   <script type="module">
+    import { OggVorbisDecoder } from './wasm-audio-decoders.js';
+
+    function isAppleDevice() {
+      return /iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent);
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (isAppleDevice()) {
+        console.log("Using WASM Audio Decoders for .ogg files...");
+        try {
+          // Example usage: decode a sample .ogg file
+          const response = await fetch('path-to-ogg-file.ogg');
+          const arrayBuffer = await response.arrayBuffer();
+          const decoder = new OggVorbisDecoder();
+          const audioData = await decoder.decode(arrayBuffer);
+
+          console.log('Decoded audio data:', audioData);
+          // Here you can use the decoded audio data, e.g. create an AudioBuffer
+          // and play it using the Web Audio API.
+        } catch (err) {
+          console.error('Error decoding OGG:', err);
+        }
+      } else {
+        console.log('No need for WASM Audio Decoders.');
+      }
+    });
+  </script>
+
+  <!-- TEST CASES:
+    1) Select a valid reader (e.g., "exclusive") and verify tracks load from the correct M3U URL.
+       Then click "تشغيل كبث قرآني" and confirm playback starts without "Tracks not ready" error.
+    2) Select an invalid or non-existent reader (manually add a new option with a bad URL) and confirm it alerts "Failed to load tracks".
+    3) Switch language to English and verify text translations appear (including track names, headings, etc.).
+    4) On an iPhone or Mac, open dev tools console and confirm the WASM decoders script logs "Using WASM Audio Decoders...".
+  -->
 </body>
 </html>
