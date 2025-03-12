@@ -734,7 +734,8 @@
   </div>
 
   <script>
-    const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
+    // Configuration and initial setup
+const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
 const m3uLinks = {
   random: "https://www.streamadqfm.store/nmsC.m3u",
   exclusive: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%AD%D8%B5%D8%B1%D9%8A.m3u",
@@ -763,6 +764,7 @@ const translationFiles = {
   zh: "https://www.streamadqfm.store/translated/en/translation_zh-cn.json"
 };
 
+// State variables
 let tracks = [];
 let isTracksReady = false;
 let currentTrackIndex = 0;
@@ -770,11 +772,41 @@ let currentReader = '';
 let isPlaying = false;
 let translations = {};
 let isTranslated = false;
+let activeAudioSource = null;
+
+// Apple device detection and audio context variables
+const isAppleDevice = /iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent);
+let audioContext;
+let oggDecoder;
 
 // Load language preference from localStorage
 const savedLanguage = localStorage.getItem('language') || 'ar';
 isTranslated = savedLanguage !== 'ar';
 
+// Create Audio Context on demand to avoid autoplay restrictions
+function getAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioContext;
+}
+
+// Initialize OGG decoder if needed
+async function initOggDecoder() {
+  if (isAppleDevice && !oggDecoder && window.OggVorbisDecoder) {
+    try {
+      oggDecoder = new window.OggVorbisDecoder();
+      console.log("OGG Vorbis decoder initialized successfully");
+      return true;
+    } catch (error) {
+      console.error("Failed to initialize OGG decoder:", error);
+      return false;
+    }
+  }
+  return false;
+}
+
+// Load track list from M3U file
 async function loadTracks(url) {
   const spinner = document.getElementById('loadingSpinner');
   spinner.style.display = 'block';
@@ -811,6 +843,7 @@ async function loadTracks(url) {
   }
 }
 
+// Display the track list in the UI
 function displayTrackList() {
   const trackListDiv = document.getElementById('trackList');
   trackListDiv.innerHTML = tracks.map((track, index) => `
@@ -820,14 +853,21 @@ function displayTrackList() {
   `).join('');
 }
 
+// Load translations for a specific language
 async function loadTranslations(lang = 'en') {
-  const url = `${translationFiles[lang]}?v=${new Date().getTime()}`;
+  if (lang === 'ar') {
+    translations = {};
+    return;
+  }
+  
+  const url = translationFiles[lang];
   if (!url) {
     console.error(`Translation file for language '${lang}' not found.`);
     return;
   }
+  
   try {
-    const response = await fetch(url);
+    const response = await fetch(`${url}?v=${new Date().getTime()}`);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     translations = await response.json();
     console.log(`Translations loaded for language: ${lang}`, translations);
@@ -837,10 +877,8 @@ async function loadTranslations(lang = 'en') {
   }
 }
 
+// Apply translations to the UI elements
 function translateUI(lang = 'ar') {
-  console.log("Translations:", translations);
-  console.log("Track Names:", tracks.map(track => track.name));
-
   const elementsToTranslate = document.querySelectorAll('[data-translate]');
   elementsToTranslate.forEach(element => {
     const key = element.getAttribute('data-translate');
@@ -854,9 +892,9 @@ function translateUI(lang = 'ar') {
   const trackItems = document.querySelectorAll('.trackItem');
   trackItems.forEach((item, index) => {
     const track = tracks[index];
-    if (translations[track.name] && lang !== 'ar') {
+    if (track && translations[track.name] && lang !== 'ar') {
       item.textContent = translations[track.name];
-    } else {
+    } else if (track) {
       item.textContent = track.name;
     }
   });
@@ -873,40 +911,34 @@ function translateUI(lang = 'ar') {
 
   const currentTrackDiv = document.getElementById("currentTrack");
   if (currentTrackDiv.textContent.includes("تستمعون الى:") || currentTrackDiv.textContent.includes("You are listening to:")) {
-    const trackName = currentTrackDiv.textContent.split(":")[1].trim();
-    const nowPlayingText = lang === 'ar' ? 'تستمعون الى:' : translations['تستمعون الى:'] || 'You are listening to:';
-    currentTrackDiv.textContent = `${nowPlayingText} ${translations[trackName] || trackName}`;
+    const trackName = currentTrackDiv.textContent.split(":")[1]?.trim();
+    if (trackName) {
+      const nowPlayingText = lang === 'ar' ? 'تستمعون الى:' : translations['تستمعون الى:'] || 'You are listening to:';
+      currentTrackDiv.textContent = `${nowPlayingText} ${translations[trackName] || trackName}`;
+    }
   }
 
   // Apply RTL or LTR direction based on the selected language
   const aboutText = document.querySelector('.about-text');
   if (aboutText) {
     if (lang === 'ar') {
-      aboutText.style.textAlign = 'right';
+      aboutText.classList.add('rtl');
+      aboutText.classList.remove('ltr');
       document.documentElement.dir = 'rtl';
     } else {
-      aboutText.style.textAlign = 'left';
+      aboutText.classList.add('ltr');
+      aboutText.classList.remove('rtl');
       document.documentElement.dir = 'ltr';
     }
   }
 }
 
-const languageSelect = document.getElementById('languageSelect');
-
-languageSelect.addEventListener('change', async (event) => {
-  const selectedLanguage = event.target.value;
-  if (selectedLanguage !== localStorage.getItem('language')) {
-    localStorage.setItem('language', selectedLanguage);
-    await loadTranslations(selectedLanguage);
-    translateUI(selectedLanguage);
-    window.location.reload();
-  }
-});
-
+// Calculate which track to play based on the scheduled time
 function calculateTrackToPlay() {
   const now = new Date();
   const button = document.getElementById('playButton');
-  button.textContent = translations['جاري التجهيز...'] || 'جاري التجهيز...';
+  const loadingText = translations['جاري التجهيز...'] || 'جاري التجهيز...';
+  button.textContent = loadingText;
 
   if (!isTracksReady || tracks.length === 0) {
     console.error('Tracks not ready or empty');
@@ -947,7 +979,8 @@ function calculateTrackToPlay() {
   }, 1000);
 }
 
-function playTrack(index, startTime = 0, isRandom = false) {
+// Play a specific track with optional start time and random flag
+async function playTrack(index, startTime = 0, isRandom = false) {
   const audioPlayer = document.getElementById("audioPlayer");
   const currentTrackDiv = document.getElementById("currentTrack");
 
@@ -956,14 +989,149 @@ function playTrack(index, startTime = 0, isRandom = false) {
     return;
   }
 
+  // Stop any currently playing source
+  if (activeAudioSource) {
+    try {
+      activeAudioSource.stop();
+      activeAudioSource.disconnect();
+    } catch (e) {
+      console.log("No active audio source to stop");
+    }
+    activeAudioSource = null;
+  }
+
   const track = tracks[index];
+  const trackUrl = track.url;
+  currentTrackIndex = index;
+  isPlaying = true;
+
   console.log(`Playing track: ${track.name} from ${startTime}s (Random: ${isRandom})`);
+  console.log(`Track URL: ${trackUrl}, Apple device: ${isAppleDevice}, OGG file: ${trackUrl.toLowerCase().endsWith('.ogg')}`);
 
-  audioPlayer.src = track.url;
+  // Handle OGG file playback on Apple devices
+  if (isAppleDevice && trackUrl.toLowerCase().endsWith('.ogg')) {
+    try {
+      // Initialize decoder if not already done
+      await initOggDecoder();
+      
+      // Set the source to an empty audio element for UI purposes
+      audioPlayer.src = '';
+      
+      // Show loading status
+      const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
+      currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name} (Loading...)`;
+      
+      // Fetch and decode the OGG file
+      const response = await fetch(trackUrl);
+      if (!response.ok) throw new Error(`Failed to fetch audio: ${response.status}`);
+      
+      const arrayBuffer = await response.arrayBuffer();
+      
+      // Use Web Audio API with the decoder
+      const ctx = getAudioContext();
+      
+      // Use the WASM decoder if available, otherwise try native decoding
+      let audioBuffer;
+      if (oggDecoder) {
+        const decodedData = await oggDecoder.decode(arrayBuffer);
+        audioBuffer = ctx.createBuffer(
+          decodedData.numberOfChannels, 
+          decodedData.length, 
+          decodedData.sampleRate
+        );
+        
+        // Copy the decoded data to the audio buffer
+        for (let channel = 0; channel < decodedData.numberOfChannels; channel++) {
+          const channelData = audioBuffer.getChannelData(channel);
+          channelData.set(decodedData.getChannelData(channel));
+        }
+      } else {
+        // Fallback to native decoding (which likely won't work for OGG on Apple)
+        try {
+          audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+        } catch (e) {
+          console.error("Native decoding failed, trying next track:", e);
+          currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+          playTrack(currentTrackIndex, 0, isRandom);
+          return;
+        }
+      }
+      
+      // Create audio source and play it
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ctx.destination);
+      activeAudioSource = source;
+      
+      // Handle start time
+      const offsetTime = Math.min(startTime, audioBuffer.duration - 1);
+      source.start(0, offsetTime);
+      
+      // Update UI to show now playing
+      currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
+      
+      // Handle track completion
+      source.onended = () => {
+        if (currentTrackIndex === index) { // Only proceed if this is still the current track
+          currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+          playTrack(currentTrackIndex, 0, isRandom);
+        }
+      };
+      
+      // Optional: add a timeout as a backup for onended
+      const playbackDuration = (audioBuffer.duration - offsetTime) * 1000;
+      setTimeout(() => {
+        if (currentTrackIndex === index) {
+          currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+          playTrack(currentTrackIndex, 0, isRandom);
+        }
+      }, playbackDuration + 1000); // Add 1 second buffer
+      
+    } catch (error) {
+      console.error("Error playing OGG file on Apple device:", error);
+      // Try playing the next track if this one fails
+      currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+      playTrack(currentTrackIndex, 0, isRandom);
+    }
+  } else {
+    // Standard HTML5 audio for non-Apple devices or non-OGG files
+    try {
+      audioPlayer.src = trackUrl;
+      
+      const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
+      currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
 
-  const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
-  currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
+      audioPlayer.onloadedmetadata = () => {
+        try {
+          audioPlayer.currentTime = startTime;
+          audioPlayer.play()
+            .catch(err => {
+              console.error("Playback error:", err);
+              alert("Error starting playback. Please click the play button.");
+            });
+        } catch (e) {
+          console.error("Error setting current time:", e);
+        }
+      };
 
+      audioPlayer.onended = () => {
+        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+        playTrack(currentTrackIndex, 0, isRandom);
+      };
+
+      audioPlayer.onerror = (e) => {
+        console.error("Audio error:", e, audioPlayer.error);
+        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+        playTrack(currentTrackIndex, 0, isRandom);
+      };
+    } catch (e) {
+      console.error("Error with HTML5 audio:", e);
+      currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+      playTrack(currentTrackIndex, 0, isRandom);
+    }
+  }
+
+  // Update track list UI
   const trackItems = document.querySelectorAll('.trackItem');
   trackItems.forEach((item, i) => {
     item.classList.toggle('active', i === index);
@@ -973,32 +1141,9 @@ function playTrack(index, startTime = 0, isRandom = false) {
   if (activeTrackItem) {
     activeTrackItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
-
-  audioPlayer.onloadedmetadata = () => {
-    try {
-      audioPlayer.currentTime = startTime;
-      audioPlayer.play()
-        .catch(err => {
-          console.error("Playback error:", err);
-          alert("Error starting playback. Please click the play button.");
-        });
-    } catch (e) {
-      console.error("Error setting current time:", e);
-    }
-  };
-
-  audioPlayer.onended = () => {
-    currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-    playTrack(currentTrackIndex, 0, isRandom);
-  };
-
-  audioPlayer.onerror = (e) => {
-    console.error("Audio error:", e);
-    currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-    playTrack(currentTrackIndex, 0, isRandom);
-  };
 }
 
+// Load selected reader's tracks
 async function loadSelectedReader() {
   const select = document.getElementById('readerSelect');
   currentReader = select.value;
@@ -1010,6 +1155,17 @@ async function loadSelectedReader() {
   audioPlayer.pause();
   audioPlayer.src = '';
 
+  // Stop any active Web Audio source
+  if (activeAudioSource) {
+    try {
+      activeAudioSource.stop();
+      activeAudioSource.disconnect();
+    } catch (e) {
+      console.log("No active audio source to stop");
+    }
+    activeAudioSource = null;
+  }
+
   const success = await loadTracks(m3uLinks[currentReader]);
   select.disabled = false;
 
@@ -1020,7 +1176,7 @@ async function loadSelectedReader() {
   }
 }
 
-// Circle Toggle Functionality
+// Toggle between main and about containers
 function toggleCircle(circleNumber) {
   const mainContainer = document.getElementById('mainContainer');
   const secondContainer = document.getElementById('secondContainer');
@@ -1042,6 +1198,7 @@ function toggleCircle(circleNumber) {
   selectedCircle.classList.add('active');
 }
 
+// Open Google Play store or web link
 function openGooglePlay() {
   // Try to open directly in Google Play app
   window.location.href = "market://details?id=com.adqfm.ARFM";
@@ -1052,14 +1209,58 @@ function openGooglePlay() {
   }, 500);
 }
 
+// Language change handler
+document.addEventListener("DOMContentLoaded", function () {
+  const languageSelector = document.getElementById("languageSelect");
+  if (languageSelector) {
+    languageSelector.addEventListener("change", async function () {
+      const selectedLanguage = this.value;
+      localStorage.setItem('language', selectedLanguage);
+      await loadTranslations(selectedLanguage);
+      translateUI(selectedLanguage);
+      
+      // Apply direction change
+      document.documentElement.dir = selectedLanguage === 'ar' ? 'rtl' : 'ltr';
+      
+      // Update about text alignment
+      const aboutText = document.querySelector('.about-text');
+      if (aboutText) {
+        if (selectedLanguage === 'ar') {
+          aboutText.classList.add('rtl');
+          aboutText.classList.remove('ltr');
+        } else {
+          aboutText.classList.add('ltr');
+          aboutText.classList.remove('rtl');
+        }
+      }
+    });
+  }
+});
+
+// Initialize on page load
 window.onload = async () => {
   console.log('Page loaded, initializing player...');
+  
+  // Check if this is an Apple device
+  if (isAppleDevice) {
+    console.log("Apple device detected, initializing OGG decoder support");
+    try {
+      const decoderInitialized = await initOggDecoder();
+      console.log("OGG decoder initialized:", decoderInitialized);
+    } catch (e) {
+      console.error("Error initializing decoder:", e);
+    }
+  }
+  
+  // Load tracks for the selected reader
   loadSelectedReader();
 
+  // Set language from localStorage
   const languageSelect = document.getElementById('languageSelect');
   const savedLanguage = localStorage.getItem('language') || 'ar';
   languageSelect.value = savedLanguage;
 
+  // Load translations if needed
   if (savedLanguage !== 'ar') {
     await loadTranslations(savedLanguage);
     translateUI(savedLanguage);
@@ -1067,74 +1268,6 @@ window.onload = async () => {
     translateUI('ar');
   }
 };
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Function to change language
-    function changeLanguage(lang) {
-        document.documentElement.lang = lang; // Set language globally
-        document.documentElement.dir = lang === "ar" ? "rtl" : "ltr"; // Set text direction
-        
-        // Update class-based direction for specific sections
-        const aboutText = document.querySelector(".about-text");
-        if (aboutText) {
-            if (lang === "ar") {
-                aboutText.style.textAlign = "right";
-                aboutText.style.direction = "rtl";
-            } else {
-                aboutText.style.textAlign = "left";
-                aboutText.style.direction = "ltr";
-            }
-        }
-    }
-
-    // Language Switch Event (Example: Dropdown Selection)
-    const languageSelector = document.getElementById("language-select");
-    if (languageSelector) {
-        languageSelector.addEventListener("change", function () {
-            changeLanguage(this.value); // Change language based on selection
-        });
-    }
-});
-
-
   </script>
-
-   <!-- Add WASM decoders for Apple devices -->
-   <script type="module">
-    import { OggVorbisDecoder } from './wasm-audio-decoders.js';
-
-    function isAppleDevice() {
-      return /iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent);
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (isAppleDevice()) {
-        console.log("Using WASM Audio Decoders for .ogg files...");
-        try {
-          // Example usage: decode a sample .ogg file
-          const response = await fetch('path-to-ogg-file.ogg');
-          const arrayBuffer = await response.arrayBuffer();
-          const decoder = new OggVorbisDecoder();
-          const audioData = await decoder.decode(arrayBuffer);
-
-          console.log('Decoded audio data:', audioData);
-          // Here you can use the decoded audio data, e.g. create an AudioBuffer
-          // and play it using the Web Audio API.
-        } catch (err) {
-          console.error('Error decoding OGG:', err);
-        }
-      } else {
-        console.log('No need for WASM Audio Decoders.');
-      }
-    });
-  </script>
-
-  <!-- TEST CASES:
-    1) Select a valid reader (e.g., "exclusive") and verify tracks load from the correct M3U URL.
-       Then click "تشغيل كبث قرآني" and confirm playback starts without "Tracks not ready" error.
-    2) Select an invalid or non-existent reader (manually add a new option with a bad URL) and confirm it alerts "Failed to load tracks".
-    3) Switch language to English and verify text translations appear (including track names, headings, etc.).
-    4) On an iPhone or Mac, open dev tools console and confirm the WASM decoders script logs "Using WASM Audio Decoders...".
-  -->
 </body>
 </html>
