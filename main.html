@@ -734,7 +734,7 @@
   </div>
 
   <script>
-    // Configuration and initial setup
+  // Configuration and initial setup
 const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
 const m3uLinks = {
   random: "https://www.streamadqfm.store/nmsC.m3u",
@@ -772,38 +772,26 @@ let currentReader = '';
 let isPlaying = false;
 let translations = {};
 let isTranslated = false;
-let activeAudioSource = null;
 
-// Apple device detection and audio context variables
-const isAppleDevice = /iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent);
-let audioContext;
-let oggDecoder;
+// Check if the current device is an Apple device
+const isAppleDevice = /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent);
+console.log("Is Apple device:", isAppleDevice);
 
 // Load language preference from localStorage
 const savedLanguage = localStorage.getItem('language') || 'ar';
 isTranslated = savedLanguage !== 'ar';
 
-// Create Audio Context on demand to avoid autoplay restrictions
-function getAudioContext() {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+// Function to get a compatible URL based on device
+function getCompatibleUrl(url) {
+  // For Apple devices, convert OGG to MP3
+  if (isAppleDevice && url.toLowerCase().endsWith('.ogg')) {
+    console.log("Converting OGG to MP3 for Apple device:", url);
+    // Try to use MP3 version of the same file
+    return url.replace(/\.ogg$/i, '.mp3');
   }
-  return audioContext;
-}
-
-// Initialize OGG decoder if needed
-async function initOggDecoder() {
-  if (isAppleDevice && !oggDecoder && window.OggVorbisDecoder) {
-    try {
-      oggDecoder = new window.OggVorbisDecoder();
-      console.log("OGG Vorbis decoder initialized successfully");
-      return true;
-    } catch (error) {
-      console.error("Failed to initialize OGG decoder:", error);
-      return false;
-    }
-  }
-  return false;
+  
+  // For non-Apple devices or non-OGG files, use the original URL
+  return url;
 }
 
 // Load track list from M3U file
@@ -980,7 +968,7 @@ function calculateTrackToPlay() {
 }
 
 // Play a specific track with optional start time and random flag
-async function playTrack(index, startTime = 0, isRandom = false) {
+function playTrack(index, startTime = 0, isRandom = false) {
   const audioPlayer = document.getElementById("audioPlayer");
   const currentTrackDiv = document.getElementById("currentTrack");
 
@@ -989,147 +977,59 @@ async function playTrack(index, startTime = 0, isRandom = false) {
     return;
   }
 
-  // Stop any currently playing source
-  if (activeAudioSource) {
-    try {
-      activeAudioSource.stop();
-      activeAudioSource.disconnect();
-    } catch (e) {
-      console.log("No active audio source to stop");
-    }
-    activeAudioSource = null;
-  }
-
   const track = tracks[index];
-  const trackUrl = track.url;
   currentTrackIndex = index;
   isPlaying = true;
+  
+  // Get a compatible URL for the current device
+  const originalUrl = track.url;
+  const compatibleUrl = getCompatibleUrl(originalUrl);
+  
+  console.log(`Playing track: ${track.name} from ${startTime}s`);
+  console.log(`Original URL: ${originalUrl}`);
+  console.log(`Compatible URL: ${compatibleUrl}`);
+  
+  // Set the audio source to the compatible URL
+  audioPlayer.src = compatibleUrl;
+  
+  // Update the UI with the current track name
+  const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
+  currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
 
-  console.log(`Playing track: ${track.name} from ${startTime}s (Random: ${isRandom})`);
-  console.log(`Track URL: ${trackUrl}, Apple device: ${isAppleDevice}, OGG file: ${trackUrl.toLowerCase().endsWith('.ogg')}`);
-
-  // Handle OGG file playback on Apple devices
-  if (isAppleDevice && trackUrl.toLowerCase().endsWith('.ogg')) {
+  // Set up event handlers
+  audioPlayer.onloadedmetadata = () => {
     try {
-      // Initialize decoder if not already done
-      await initOggDecoder();
-      
-      // Set the source to an empty audio element for UI purposes
-      audioPlayer.src = '';
-      
-      // Show loading status
-      const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
-      currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name} (Loading...)`;
-      
-      // Fetch and decode the OGG file
-      const response = await fetch(trackUrl);
-      if (!response.ok) throw new Error(`Failed to fetch audio: ${response.status}`);
-      
-      const arrayBuffer = await response.arrayBuffer();
-      
-      // Use Web Audio API with the decoder
-      const ctx = getAudioContext();
-      
-      // Use the WASM decoder if available, otherwise try native decoding
-      let audioBuffer;
-      if (oggDecoder) {
-        const decodedData = await oggDecoder.decode(arrayBuffer);
-        audioBuffer = ctx.createBuffer(
-          decodedData.numberOfChannels, 
-          decodedData.length, 
-          decodedData.sampleRate
-        );
-        
-        // Copy the decoded data to the audio buffer
-        for (let channel = 0; channel < decodedData.numberOfChannels; channel++) {
-          const channelData = audioBuffer.getChannelData(channel);
-          channelData.set(decodedData.getChannelData(channel));
-        }
-      } else {
-        // Fallback to native decoding (which likely won't work for OGG on Apple)
-        try {
-          audioBuffer = await ctx.decodeAudioData(arrayBuffer);
-        } catch (e) {
-          console.error("Native decoding failed, trying next track:", e);
+      audioPlayer.currentTime = startTime;
+      audioPlayer.play()
+        .catch(err => {
+          console.error("Playback error:", err);
+          // Try next track on error
           currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
           playTrack(currentTrackIndex, 0, isRandom);
-          return;
-        }
-      }
-      
-      // Create audio source and play it
-      const source = ctx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(ctx.destination);
-      activeAudioSource = source;
-      
-      // Handle start time
-      const offsetTime = Math.min(startTime, audioBuffer.duration - 1);
-      source.start(0, offsetTime);
-      
-      // Update UI to show now playing
-      currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
-      
-      // Handle track completion
-      source.onended = () => {
-        if (currentTrackIndex === index) { // Only proceed if this is still the current track
-          currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-          playTrack(currentTrackIndex, 0, isRandom);
-        }
-      };
-      
-      // Optional: add a timeout as a backup for onended
-      const playbackDuration = (audioBuffer.duration - offsetTime) * 1000;
-      setTimeout(() => {
-        if (currentTrackIndex === index) {
-          currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-          playTrack(currentTrackIndex, 0, isRandom);
-        }
-      }, playbackDuration + 1000); // Add 1 second buffer
-      
-    } catch (error) {
-      console.error("Error playing OGG file on Apple device:", error);
-      // Try playing the next track if this one fails
-      currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-      playTrack(currentTrackIndex, 0, isRandom);
-    }
-  } else {
-    // Standard HTML5 audio for non-Apple devices or non-OGG files
-    try {
-      audioPlayer.src = trackUrl;
-      
-      const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
-      currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
-
-      audioPlayer.onloadedmetadata = () => {
-        try {
-          audioPlayer.currentTime = startTime;
-          audioPlayer.play()
-            .catch(err => {
-              console.error("Playback error:", err);
-              alert("Error starting playback. Please click the play button.");
-            });
-        } catch (e) {
-          console.error("Error setting current time:", e);
-        }
-      };
-
-      audioPlayer.onended = () => {
-        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-        playTrack(currentTrackIndex, 0, isRandom);
-      };
-
-      audioPlayer.onerror = (e) => {
-        console.error("Audio error:", e, audioPlayer.error);
-        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-        playTrack(currentTrackIndex, 0, isRandom);
-      };
+        });
     } catch (e) {
-      console.error("Error with HTML5 audio:", e);
-      currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-      playTrack(currentTrackIndex, 0, isRandom);
+      console.error("Error setting current time:", e);
     }
-  }
+  };
+
+  audioPlayer.onended = () => {
+    currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+    playTrack(currentTrackIndex, 0, isRandom);
+  };
+
+  audioPlayer.onerror = (e) => {
+    console.error("Audio error:", e);
+    console.log("Audio error code:", audioPlayer.error ? audioPlayer.error.code : "unknown");
+    
+    // If this is an Apple device and we were trying to play an OGG file directly
+    if (isAppleDevice && originalUrl.toLowerCase().endsWith('.ogg') && compatibleUrl === originalUrl) {
+      console.warn("OGG format not supported on this device. Please provide MP3 versions of your audio files.");
+    }
+    
+    // Try next track on error
+    currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+    playTrack(currentTrackIndex, 0, isRandom);
+  };
 
   // Update track list UI
   const trackItems = document.querySelectorAll('.trackItem');
@@ -1154,17 +1054,6 @@ async function loadSelectedReader() {
   const audioPlayer = document.getElementById('audioPlayer');
   audioPlayer.pause();
   audioPlayer.src = '';
-
-  // Stop any active Web Audio source
-  if (activeAudioSource) {
-    try {
-      activeAudioSource.stop();
-      activeAudioSource.disconnect();
-    } catch (e) {
-      console.log("No active audio source to stop");
-    }
-    activeAudioSource = null;
-  }
 
   const success = await loadTracks(m3uLinks[currentReader]);
   select.disabled = false;
@@ -1240,17 +1129,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // Initialize on page load
 window.onload = async () => {
   console.log('Page loaded, initializing player...');
-  
-  // Check if this is an Apple device
-  if (isAppleDevice) {
-    console.log("Apple device detected, initializing OGG decoder support");
-    try {
-      const decoderInitialized = await initOggDecoder();
-      console.log("OGG decoder initialized:", decoderInitialized);
-    } catch (e) {
-      console.error("Error initializing decoder:", e);
-    }
-  }
+  console.log('Device detection - Apple device:', isAppleDevice);
   
   // Load tracks for the selected reader
   loadSelectedReader();
