@@ -734,8 +734,7 @@
   </div>
 
   <script>
-  // Configuration and initial setup
-const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
+  const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
 const m3uLinks = {
   random: "https://www.streamadqfm.store/nmsC.m3u",
   exclusive: "https://www.streamadqfm.store/%D8%A7%D9%84%D8%AD%D8%B5%D8%B1%D9%8A.m3u",
@@ -764,7 +763,6 @@ const translationFiles = {
   zh: "https://www.streamadqfm.store/translated/en/translation_zh-cn.json"
 };
 
-// State variables
 let tracks = [];
 let isTracksReady = false;
 let currentTrackIndex = 0;
@@ -781,20 +779,6 @@ console.log("Is Apple device:", isAppleDevice);
 const savedLanguage = localStorage.getItem('language') || 'ar';
 isTranslated = savedLanguage !== 'ar';
 
-// Function to get a compatible URL based on device
-function getCompatibleUrl(url) {
-  // For Apple devices, convert OGG to MP3
-  if (isAppleDevice && url.toLowerCase().endsWith('.ogg')) {
-    console.log("Converting OGG to MP3 for Apple device:", url);
-    // Try to use MP3 version of the same file
-    return url.replace(/\.ogg$/i, '.mp3');
-  }
-  
-  // For non-Apple devices or non-OGG files, use the original URL
-  return url;
-}
-
-// Load track list from M3U file
 async function loadTracks(url) {
   const spinner = document.getElementById('loadingSpinner');
   spinner.style.display = 'block';
@@ -831,7 +815,6 @@ async function loadTracks(url) {
   }
 }
 
-// Display the track list in the UI
 function displayTrackList() {
   const trackListDiv = document.getElementById('trackList');
   trackListDiv.innerHTML = tracks.map((track, index) => `
@@ -841,7 +824,6 @@ function displayTrackList() {
   `).join('');
 }
 
-// Load translations for a specific language
 async function loadTranslations(lang = 'en') {
   if (lang === 'ar') {
     translations = {};
@@ -865,7 +847,6 @@ async function loadTranslations(lang = 'en') {
   }
 }
 
-// Apply translations to the UI elements
 function translateUI(lang = 'ar') {
   const elementsToTranslate = document.querySelectorAll('[data-translate]');
   elementsToTranslate.forEach(element => {
@@ -921,7 +902,6 @@ function translateUI(lang = 'ar') {
   }
 }
 
-// Calculate which track to play based on the scheduled time
 function calculateTrackToPlay() {
   const now = new Date();
   const button = document.getElementById('playButton');
@@ -967,7 +947,6 @@ function calculateTrackToPlay() {
   }, 1000);
 }
 
-// Play a specific track with optional start time and random flag
 function playTrack(index, startTime = 0, isRandom = false) {
   const audioPlayer = document.getElementById("audioPlayer");
   const currentTrackDiv = document.getElementById("currentTrack");
@@ -977,20 +956,51 @@ function playTrack(index, startTime = 0, isRandom = false) {
     return;
   }
 
+  // Clear any existing source elements
+  while (audioPlayer.firstChild) {
+    audioPlayer.removeChild(audioPlayer.firstChild);
+  }
+  
   const track = tracks[index];
   currentTrackIndex = index;
   isPlaying = true;
   
-  // Get a compatible URL for the current device
-  const originalUrl = track.url;
-  const compatibleUrl = getCompatibleUrl(originalUrl);
-  
   console.log(`Playing track: ${track.name} from ${startTime}s`);
-  console.log(`Original URL: ${originalUrl}`);
-  console.log(`Compatible URL: ${compatibleUrl}`);
+  console.log(`Original URL: ${track.url}`);
   
-  // Set the audio source to the compatible URL
-  audioPlayer.src = compatibleUrl;
+  // Create source elements for different formats
+  // First, add OGG source
+  const oggSource = document.createElement('source');
+  oggSource.src = track.url;
+  oggSource.type = 'audio/ogg';
+  
+  // Then add MP3 source as fallback
+  const mp3Source = document.createElement('source');
+  mp3Source.src = track.url.replace(/\.ogg$/i, '.mp3');
+  mp3Source.type = 'audio/mpeg';
+  
+  // Add AAC/M4A source as another fallback
+  const aacSource = document.createElement('source');
+  aacSource.src = track.url.replace(/\.ogg$/i, '.m4a');  
+  aacSource.type = 'audio/mp4';
+  
+  // Add WAV source as a final fallback
+  const wavSource = document.createElement('source');
+  wavSource.src = track.url.replace(/\.ogg$/i, '.wav');
+  wavSource.type = 'audio/wav';
+  
+  // Add fallback text
+  const fallbackText = document.createTextNode('Your browser does not support any of the available audio formats.');
+  
+  // Add sources to audio element (browser will use the first one it supports)
+  audioPlayer.appendChild(oggSource);
+  audioPlayer.appendChild(mp3Source);
+  audioPlayer.appendChild(aacSource);
+  audioPlayer.appendChild(wavSource);
+  audioPlayer.appendChild(fallbackText);
+  
+  // Load the audio
+  audioPlayer.load();
   
   // Update the UI with the current track name
   const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
@@ -1019,11 +1029,10 @@ function playTrack(index, startTime = 0, isRandom = false) {
 
   audioPlayer.onerror = (e) => {
     console.error("Audio error:", e);
-    console.log("Audio error code:", audioPlayer.error ? audioPlayer.error.code : "unknown");
     
-    // If this is an Apple device and we were trying to play an OGG file directly
-    if (isAppleDevice && originalUrl.toLowerCase().endsWith('.ogg') && compatibleUrl === originalUrl) {
-      console.warn("OGG format not supported on this device. Please provide MP3 versions of your audio files.");
+    // Show specific error message for Apple devices
+    if (isAppleDevice) {
+      console.warn("Note: Apple devices don't support OGG format natively. Make sure MP3, M4A or WAV versions are available.");
     }
     
     // Try next track on error
@@ -1043,7 +1052,6 @@ function playTrack(index, startTime = 0, isRandom = false) {
   }
 }
 
-// Load selected reader's tracks
 async function loadSelectedReader() {
   const select = document.getElementById('readerSelect');
   currentReader = select.value;
@@ -1053,7 +1061,11 @@ async function loadSelectedReader() {
 
   const audioPlayer = document.getElementById('audioPlayer');
   audioPlayer.pause();
-  audioPlayer.src = '';
+  
+  // Clear any existing source elements
+  while (audioPlayer.firstChild) {
+    audioPlayer.removeChild(audioPlayer.firstChild);
+  }
 
   const success = await loadTracks(m3uLinks[currentReader]);
   select.disabled = false;
@@ -1065,7 +1077,6 @@ async function loadSelectedReader() {
   }
 }
 
-// Toggle between main and about containers
 function toggleCircle(circleNumber) {
   const mainContainer = document.getElementById('mainContainer');
   const secondContainer = document.getElementById('secondContainer');
@@ -1087,7 +1098,6 @@ function toggleCircle(circleNumber) {
   selectedCircle.classList.add('active');
 }
 
-// Open Google Play store or web link
 function openGooglePlay() {
   // Try to open directly in Google Play app
   window.location.href = "market://details?id=com.adqfm.ARFM";
@@ -1098,7 +1108,6 @@ function openGooglePlay() {
   }, 500);
 }
 
-// Language change handler
 document.addEventListener("DOMContentLoaded", function () {
   const languageSelector = document.getElementById("languageSelect");
   if (languageSelector) {
@@ -1126,7 +1135,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// Initialize on page load
 window.onload = async () => {
   console.log('Page loaded, initializing player...');
   console.log('Device detection - Apple device:', isAppleDevice);
