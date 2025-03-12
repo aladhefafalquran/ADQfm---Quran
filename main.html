@@ -956,51 +956,24 @@ function playTrack(index, startTime = 0, isRandom = false) {
     return;
   }
 
-  // Clear any existing source elements
-  while (audioPlayer.firstChild) {
-    audioPlayer.removeChild(audioPlayer.firstChild);
-  }
-  
   const track = tracks[index];
   currentTrackIndex = index;
   isPlaying = true;
   
+  // Get appropriate URL based on device
+  let audioUrl = track.url;
+  
+  // For Apple devices, replace OGG with MP3
+  if (isAppleDevice && audioUrl.toLowerCase().endsWith('.ogg')) {
+    audioUrl = audioUrl.replace(/\.ogg$/i, '.mp3');
+    console.log("Apple device detected, using MP3 version:", audioUrl);
+  }
+  
   console.log(`Playing track: ${track.name} from ${startTime}s`);
-  console.log(`Original URL: ${track.url}`);
+  console.log(`URL: ${audioUrl}`);
   
-  // Create source elements for different formats
-  // First, add OGG source
-  const oggSource = document.createElement('source');
-  oggSource.src = track.url;
-  oggSource.type = 'audio/ogg';
-  
-  // Then add MP3 source as fallback
-  const mp3Source = document.createElement('source');
-  mp3Source.src = track.url.replace(/\.ogg$/i, '.mp3');
-  mp3Source.type = 'audio/mpeg';
-  
-  // Add AAC/M4A source as another fallback
-  const aacSource = document.createElement('source');
-  aacSource.src = track.url.replace(/\.ogg$/i, '.m4a');  
-  aacSource.type = 'audio/mp4';
-  
-  // Add WAV source as a final fallback
-  const wavSource = document.createElement('source');
-  wavSource.src = track.url.replace(/\.ogg$/i, '.wav');
-  wavSource.type = 'audio/wav';
-  
-  // Add fallback text
-  const fallbackText = document.createTextNode('Your browser does not support any of the available audio formats.');
-  
-  // Add sources to audio element (browser will use the first one it supports)
-  audioPlayer.appendChild(oggSource);
-  audioPlayer.appendChild(mp3Source);
-  audioPlayer.appendChild(aacSource);
-  audioPlayer.appendChild(wavSource);
-  audioPlayer.appendChild(fallbackText);
-  
-  // Load the audio
-  audioPlayer.load();
+  // Set the audio source
+  audioPlayer.src = audioUrl;
   
   // Update the UI with the current track name
   const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
@@ -1013,7 +986,6 @@ function playTrack(index, startTime = 0, isRandom = false) {
       audioPlayer.play()
         .catch(err => {
           console.error("Playback error:", err);
-          // Try next track on error
           currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
           playTrack(currentTrackIndex, 0, isRandom);
         });
@@ -1029,13 +1001,24 @@ function playTrack(index, startTime = 0, isRandom = false) {
 
   audioPlayer.onerror = (e) => {
     console.error("Audio error:", e);
+    console.log("Audio error code:", audioPlayer.error ? audioPlayer.error.code : "unknown");
     
-    // Show specific error message for Apple devices
-    if (isAppleDevice) {
-      console.warn("Note: Apple devices don't support OGG format natively. Make sure MP3, M4A or WAV versions are available.");
+    // If MP3 version fails on Apple device, try a different format as well
+    if (isAppleDevice && audioUrl.toLowerCase().endsWith('.mp3')) {
+      console.log("MP3 fallback failed, trying M4A version");
+      const m4aUrl = audioUrl.replace(/\.mp3$/i, '.m4a');
+      audioPlayer.src = m4aUrl;
+      audioPlayer.load();
+      audioPlayer.play().catch(err => {
+        console.error("M4A fallback also failed:", err);
+        // Move to next track after all fallbacks fail
+        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+        playTrack(currentTrackIndex, 0, isRandom);
+      });
+      return;
     }
     
-    // Try next track on error
+    // If not Apple device or if fallbacks failed, try next track
     currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
     playTrack(currentTrackIndex, 0, isRandom);
   };
@@ -1061,11 +1044,7 @@ async function loadSelectedReader() {
 
   const audioPlayer = document.getElementById('audioPlayer');
   audioPlayer.pause();
-  
-  // Clear any existing source elements
-  while (audioPlayer.firstChild) {
-    audioPlayer.removeChild(audioPlayer.firstChild);
-  }
+  audioPlayer.src = '';
 
   const success = await loadTracks(m3uLinks[currentReader]);
   select.disabled = false;
