@@ -6,14 +6,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <!-- Add these in the head section of your HTML -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/opus-recorder/0.5.0/waveWorker.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/opus-recorder/0.5.0/encoderWorker.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/opus-recorder/0.5.0/decoderWorker.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/opus-recorder/0.5.0/oggopusDecoder.min.js"></script>
-  <script src="main.js"></script>
   <title>البرنامج القرآني</title>
   <link rel="stylesheet" href="style.css">
+  
 </head>
 <body>
   <div class="container" id="mainContainer">
@@ -22,22 +17,22 @@
     <!-- Language Select Dropdown -->
     <div class="language-select">
       <select id="languageSelect">
-        <option value="ar">العربية</option>
-        <option value="en">English</option>
-        <option value="tr">Türkçe</option>
-        <option value="de">Deutsch</option>
-        <option value="fr">Français</option>
-        <option value="hi">हिन्दी</option>
-        <option value="id">Bahasa Indonesia</option>
-        <option value="it">Italiano</option>
-        <option value="ja">日本語</option>
-        <option value="ko">한국어</option>
-        <option value="nl">Nederlands</option>
-        <option value="pt">Português</option>
-        <option value="ru">Русский</option>
-        <option value="sw">Kiswahili</option>
-        <option value="zh">中文 (简体)</option>
-      </select>
+        <option value="ar">العربية - AR</option>
+        <option value="en">English - EN</option>
+        <option value="tr">Türkçe - TR</option>
+        <option value="de">Deutsch - DE</option>
+        <option value="fr">Français - FR</option>
+        <option value="hi">हिन्दी - HI</option>
+        <option value="id">Bahasa Indonesia - ID</option>
+        <option value="it">Italiano - IT</option>
+        <option value="ja">日本語 - JA</option>
+        <option value="ko">한국어 - KO</option>
+        <option value="nl">Nederlands - NL</option>
+        <option value="pt">Português - PT</option>
+        <option value="ru">Русский - RU</option>
+        <option value="sw">Kiswahili - SW</option>
+        <option value="zh">中文 (简体) - ZH</option>
+    </select>
     </div>
 
     <select id="readerSelect" onchange="loadSelectedReader()">
@@ -70,21 +65,7 @@
   <!-- Second Container -->
   <div class="container2" id="secondContainer">
     <div class="about-content">
-      <h1 data-translate="about_title" data-ar="عن الإذاعة">عن الإذاعة</h1>
-      <div class="about-text rtl">
-        <p data-translate="about_welcome" data-ar="نرحب بكم في إذاعة على ضفاف القرآن، وجهتك المفضلة للاستماع إلى القرآن الكريم برواية حفص عن عاصم. نسعى جاهدين لتوفير تجربة استماع فريدة ومريحة لجميع محبي القرآن.">نرحب بكم في إذاعة على ضفاف القرآن، وجهتك المفضلة للاستماع إلى القرآن الكريم برواية حفص عن عاصم. نسعى جاهدين لتوفير تجربة استماع فريدة ومريحة لجميع محبي القرآن.</p>
-        
-        <h2 data-translate="about_features" data-ar="ما يميزنا:">ما يميزنا:</h2>
-        <ul>
-          <li><strong data-translate="about_feature1" data-ar="تنوع القراء والسور:">تنوع القراء والسور:</strong> <span data-translate="about_feature1_desc" data-ar="نقدم لك مجموعة واسعة من القراء المتميزين، ويمكنك اختيار السورة التي ترغب في الاستماع إليها بحرية تامة.">نقدم لك مجموعة واسعة من القراء المتميزين، ويمكنك اختيار السورة التي ترغب في الاستماع إليها بحرية تامة.</span></li>
-          <li><strong data-translate="about_feature2" data-ar="الاستماع العشوائي:">الاستماع العشوائي:</strong> <span data-translate="about_feature2_desc" data-ar="استمتع بتجربة استماع جديدة في كل مرة، حيث يمكنك اختيار الاستماع العشوائي لقارئ معين.">استمتع بتجربة استماع جديدة في كل مرة، حيث يمكنك اختيار الاستماع العشوائي لقارئ معين.</span></li>
-          <li><strong data-translate="about_feature3" data-ar="التفسير الصوتي:">التفسير الصوتي:</strong> <span data-translate="about_feature3_desc" data-ar="إلى جانب التلاوات القرآنية، نقدم لك دروسًا تفسيرية صوتية باللغة العربية لتعميق فهمك ومعرفتك بالقرآن الكريم.">إلى جانب التلاوات القرآنية، نقدم لك دروسًا تفسيرية صوتية باللغة العربية لتعميق فهمك ومعرفتك بالقرآن الكريم.</span></li>
-          <li><strong data-translate="about_feature4" data-ar="البث المباشر:">البث المباشر:</strong> <span data-translate="about_feature4_desc" data-ar="استمع إلى إذاعتنا على مدار الساعة عبر">استمع إلى إذاعتنا على مدار الساعة عبر</span> 
-            <a href="https://adqfm.net/" target="_blank" rel="noopener noreferrer" data-translate="about_website" data-ar="موقعنا الإلكتروني">موقعنا الإلكتروني</a> <span data-translate="about_or" data-ar="أو">أو</span> 
-            <span data-translate="about_download_app" data-ar="قم بتحميل تطبيقنا من">قم بتحميل تطبيقنا من</span> 
-            <a href="https://play.google.com/store/apps/details?id=com.adqfm.ARFM" target="_blank" rel="noopener noreferrer" onclick="openGooglePlay()" data-translate="about_google_play" data-ar="متجر جوجل بلاي">متجر جوجل بلاي</a>.</li>
-        </ul>
-      </div>
+      <!-- Your about content here -->
     </div>
     
     <!-- Circle Container for Second Container -->
@@ -93,5 +74,8 @@
       <div class="circle" onclick="toggleCircle(2)"></div>
     </div>
   </div>
+
+  <!-- IMPORTANT: Include the JavaScript file here -->
+  <script src="main.js"></script>
 </body>
 </html>

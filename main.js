@@ -1,16 +1,3 @@
-// Improved iOS detection
-const isAppleDevice = /iPad|iPhone|iPod|Mac/.test(navigator.userAgent) || 
-                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-console.log("Is Apple device:", isAppleDevice);
-
-// Check if OGG format is supported
-function isOggSupported() {
-  const audio = document.createElement('audio');
-  return !!audio.canPlayType && audio.canPlayType('audio/ogg; codecs="vorbis"') !== '';
-}
-const canPlayOgg = isOggSupported();
-console.log("OGG format supported:", canPlayOgg);
-
 // Configuration for the audio player
 const scheduledDateTime = new Date('2025-01-14T04:50:00+03:00');
 const m3uLinks = {
@@ -50,24 +37,14 @@ let isPlaying = false;
 let translations = {};
 let isTranslated = false;
 
-// Function to modify URL based on device capabilities
-function getCompatibleAudioUrl(url) {
-  if (!url) return url;
-  
-  // For Apple devices, always use MP3 instead of OGG
-  if (isAppleDevice && url.toLowerCase().endsWith('.ogg')) {
-    return url.replace(/\.ogg$/i, '.mp3');
-  }
-  
-  return url;
-}
+// Check if current device is an iOS/Apple device
+const isAppleDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
 // Load tracks from an M3U file
 async function loadTracks(url) {
   const spinner = document.getElementById('loadingSpinner');
   spinner.style.display = 'block';
   
-  // Quick check if the URL is valid
   if (!url) {
     console.error('No valid M3U link found for this reader');
     alert('No valid link provided for this reciter.');
@@ -90,7 +67,14 @@ async function loadTracks(url) {
         const name = parts[1]?.trim() || "Unknown Track";
         tempTrack = { duration, name };
       } else if (tempTrack && !line.startsWith("#")) {
-        tempTrack.url = line.trim();
+        let url = line.trim();
+        
+        // For iOS devices, directly replace .ogg with .mp3 in the URL
+        if (isAppleDevice && url.toLowerCase().endsWith('.ogg')) {
+          url = url.replace(/\.ogg$/i, '.mp3');
+        }
+        
+        tempTrack.url = url;
         tracks.push(tempTrack);
         tempTrack = null;
       }
@@ -251,7 +235,7 @@ function calculateTrackToPlay() {
   }, 1000);
 }
 
-// Enhanced playTrack function with better format handling
+// Play a specific track
 function playTrack(index, startTime = 0, isRandom = false) {
   const audioPlayer = document.getElementById("audioPlayer");
   const currentTrackDiv = document.getElementById("currentTrack");
@@ -265,20 +249,15 @@ function playTrack(index, startTime = 0, isRandom = false) {
   currentTrackIndex = index;
   isPlaying = true;
   
-  // Get the original URL and track file extension
-  const originalUrl = track.url;
-  const fileExtension = originalUrl.split('.').pop().toLowerCase();
-  
-  // Get compatible URL for this device
-  let audioUrl = getCompatibleAudioUrl(originalUrl);
-  console.log(`Original URL: ${originalUrl}`);
-  console.log(`Compatible URL: ${audioUrl}`);
+  console.log(`Playing track: ${track.name} from ${startTime}s, URL: ${track.url}`);
   
   // Set the audio source
-  audioPlayer.src = audioUrl;
+  audioPlayer.src = track.url;
   
   // Update the UI with the current track name
-  const nowPlayingText = isTranslated ? translations['تستمعون الى:'] || 'You are listening to:' : 'تستمعون الى:';
+  const nowPlayingText = isTranslated ? 
+    translations['تستمعون الى:'] || 'You are listening to:' : 
+    'تستمعون الى:';
   currentTrackDiv.textContent = `${nowPlayingText} ${translations[track.name] || track.name}`;
 
   // Set up event handlers
@@ -288,11 +267,11 @@ function playTrack(index, startTime = 0, isRandom = false) {
       audioPlayer.play()
         .catch(err => {
           console.error("Playback error:", err);
-          tryAlternateFormat();
+          handlePlaybackError();
         });
     } catch (e) {
       console.error("Error setting current time:", e);
-      tryAlternateFormat();
+      handlePlaybackError();
     }
   };
 
@@ -304,58 +283,42 @@ function playTrack(index, startTime = 0, isRandom = false) {
   audioPlayer.onerror = (e) => {
     console.error("Audio error:", e);
     console.log("Audio error code:", audioPlayer.error ? audioPlayer.error.code : "unknown");
-    tryAlternateFormat();
+    handlePlaybackError();
   };
   
-  // Try alternate format or move to next track
-  function tryAlternateFormat() {
-    // If we're using the modified URL and it failed, try the original format
-    if (audioUrl !== originalUrl) {
-      console.log("Modified URL failed, trying original format:", originalUrl);
-      audioPlayer.src = originalUrl;
-      audioPlayer.load();
-      audioPlayer.play().catch(err => {
-        console.error("Original format also failed:", err);
-        tryM4AFormat();
-      });
-    } 
-    // If we're using OGG and it failed, try MP3
-    else if (fileExtension === 'ogg') {
+  // Handle playback errors
+  function handlePlaybackError() {
+    // Try alternate format if OGG format
+    const originalUrl = track.url;
+    if (originalUrl.toLowerCase().endsWith('.ogg')) {
       const mp3Url = originalUrl.replace(/\.ogg$/i, '.mp3');
-      console.log("OGG failed, trying MP3 format:", mp3Url);
+      console.log("Trying MP3 format:", mp3Url);
+      
       audioPlayer.src = mp3Url;
       audioPlayer.load();
       audioPlayer.play().catch(err => {
         console.error("MP3 format also failed:", err);
-        tryM4AFormat();
+        moveToNextTrack();
       });
-    }
-    // In all other cases, just move to the next track
-    else {
-      tryM4AFormat();
-    }
-  }
-  
-  // Try M4A as a last resort
-  function tryM4AFormat() {
-    // Try M4A as a last resort
-    if (fileExtension !== 'm4a') {
-      const m4aUrl = originalUrl.replace(/\.(ogg|mp3)$/i, '.m4a');
-      console.log("Trying M4A format as last resort:", m4aUrl);
-      audioPlayer.src = m4aUrl;
+    } else if (originalUrl.toLowerCase().endsWith('.mp3')) {
+      // Try OGG if MP3 fails
+      const oggUrl = originalUrl.replace(/\.mp3$/i, '.ogg');
+      console.log("Trying OGG format:", oggUrl);
+      
+      audioPlayer.src = oggUrl;
       audioPlayer.load();
       audioPlayer.play().catch(err => {
-        console.error("M4A format also failed:", err);
-        nextTrack();
+        console.error("OGG format also failed:", err);
+        moveToNextTrack();
       });
     } else {
-      nextTrack();
+      moveToNextTrack();
     }
   }
   
-  // Move to next track when all formats fail
-  function nextTrack() {
-    console.log("All formats failed, moving to next track");
+  // Move to next track
+  function moveToNextTrack() {
+    console.log("Moving to next track");
     currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
     playTrack(currentTrackIndex, 0, isRandom);
   }
@@ -427,6 +390,9 @@ function openGooglePlay() {
 
 // Initialize event listeners when DOM is loaded
 document.addEventListener("DOMContentLoaded", function() {
+  console.log("DOM fully loaded");
+  console.log("iOS device detected:", isAppleDevice);
+  
   // Language selection handling
   const languageSelector = document.getElementById("languageSelect");
   if (languageSelector) {
@@ -443,8 +409,7 @@ document.addEventListener("DOMContentLoaded", function() {
 // Initialize everything when the page loads
 window.onload = async () => {
   console.log('Page loaded, initializing player...');
-  console.log('Device detection - Apple device:', isAppleDevice);
-  console.log('OGG format supported:', canPlayOgg);
+  console.log('iOS device detected:', isAppleDevice);
   
   // Set language from localStorage
   const savedLanguage = localStorage.getItem('language') || 'ar';
