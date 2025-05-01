@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Theme Audio Player</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --primary-color: #1DB954;
+            --text-color: #FFFFFF;
+            --secondary-color: #282828;
+            --hover-color: #1ED760;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 80%;
+            max-width: 500px;
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .player-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .player-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .player-btn {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .player-btn:hover {
+            background-color: var(--hover-color);
+            transform: scale(1.05);
+        }
+        
+        .player-btn svg {
+            fill: var(--text-color);
+            width: 24px;
+            height: 24px;
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .volume-control svg {
+            fill: var(--text-color);
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        
+        .volume-slider {
+            appearance: none;
+            width: 50%;
+            height: 5px;
+            border-radius: 5px;
+            background: #4d4d4d;
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+        }
+        
+        .player-status {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+            min-height: 20px;
+        }
+        
+        .visualizer-container {
+            width: 100%;
+            height: 80px;
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .visualizer {
+            display: flex;
+            align-items: flex-end;
+            height: 100%;
+            width: 100%;
+            padding: 0;
+        }
+        
+        .visualizer-bar {
+            flex: 1;
+            margin: 0 1px;
+            background: var(--primary-color);
+            height: 5px;
+            transition: height 0.05s ease;
+        }
+        
+        .loading {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .now-playing {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #a7a7a7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="player-header">
+            <h1>Radio Stream Player</h1>
+            <p>Listen to your favorite stream in high quality</p>
+        </div>
+        
+        <div class="loading" id="loadingIndicator">
+            <div class="loading-spinner"></div>
+            <span id="loadingText">Processing stream... Please wait</span>
+        </div>
+        
+        <div class="player-status" id="playerStatus">
+            Ready to play
+        </div>
+        
+        <div class="visualizer-container">
+            <div class="visualizer" id="audioVisualizer">
+                <!-- Bars will be added dynamically with JavaScript -->
+            </div>
+        </div>
+        
+        <div class="player-controls">
+            <button class="player-btn" id="playBtn" title="Play">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+            </button>
+            <button class="player-btn" id="stopBtn" title="Stop">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M6 6h12v12H6z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="volume-control">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+            <input type="range" min="0" max="1" step="0.01" value="0.7" class="volume-slider" id="volumeSlider">
+        </div>
+        
+        <div class="now-playing" id="nowPlaying">
+            Not playing
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.8/hls.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const playBtn = document.getElementById('playBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const playerStatus = document.getElementById('playerStatus');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const loadingText = document.getElementById('loadingText');
+            const nowPlaying = document.getElementById('nowPlaying');
+            const visualizerContainer = document.getElementById('audioVisualizer');
+            
+            // Create audio element
+            const audio = new Audio();
+            audio.crossOrigin = "anonymous";
+            
+            // Stream URL
+            const streamUrl = 'https://www.streamadqfm.store/%D8%A7%D9%84%D8%AD%D8%B5%D8%B1%D9%8A.m3u';
+            
+            // Audio context for visualization and format conversion
+            let audioContext;
+            let analyser;
+            let dataArray;
+            let sourceNode;
+            let animationFrame;
+            let visualizerBars = [];
+            let audioProcessor;
+            let mp3Encoder;
+            let mp3Data = [];
+            let originalFormat = '';
+            
+            // Create visualizer bars
+            const createVisualizer = () => {
+                // Clear existing bars
+                visualizerContainer.innerHTML = '';
+                visualizerBars = [];
+                
+                // Create new bars
+                const barCount = 50;
+                for (let i = 0; i < barCount; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'visualizer-bar';
+                    visualizerContainer.appendChild(bar);
+                    visualizerBars.push(bar);
+                }
+            };
+            
+            createVisualizer();
+            
+            // Setup audio context
+            const setupAudioContext = () => {
+                if (audioContext) return;
+                
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 256;
+                    
+                    sourceNode = audioContext.createMediaElementSource(audio);
+                    sourceNode.connect(analyser);
+                    analyser.connect(audioContext.destination);
+                    
+                    const bufferLength = analyser.frequencyBinCount;
+                    dataArray = new Uint8Array(bufferLength);
+                } catch (e) {
+                    console.error('Web Audio API not supported:', e);
+                    playerStatus.textContent = 'Audio visualization not supported in your browser';
+                }
+            };
+            
+            // Update visualizer animation
+            const updateVisualizer = () => {
+                if (!audioContext || !analyser) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                
+                for (let i = 0; i < visualizerBars.length; i++) {
+                    const index = Math.floor(i * (dataArray.length / visualizerBars.length));
+                    const value = dataArray[index] / 255;
+                    const height = value * 100;
+                    visualizerBars[i].style.height = `${height}%`;
+                }
+                
+                animationFrame = requestAnimationFrame(updateVisualizer);
+            };
+            
+            // Store the playlist tracks
+            let playlistTracks = [];
+            let currentTrackIndex = 0;
+            
+            // Fetch and process the M3U file
+            const fetchAndProcessM3U = async () => {
+                loadingIndicator.style.display = 'flex';
+                loadingText.textContent = 'Loading playlist information...';
+                playerStatus.textContent = 'Loading playlist...';
+                
+                try {
+                    const response = await fetch(streamUrl);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch playlist information');
+                    }
+                    
+                    const m3uContent = await response.text();
+                    playlistTracks = parseM3U(m3uContent);
+                    
+                    if (playlistTracks.length === 0) {
+                        throw new Error('No valid tracks found in the playlist');
+                    }
+                    
+                    console.log(`Loaded playlist with ${playlistTracks.length} tracks`);
+                    
+                    // Start with the first track
+                    currentTrackIndex = 0;
+                    
+                    loadingText.textContent = 'Preparing audio stream...';
+                    playerStatus.textContent = `Loading track 1 of ${playlistTracks.length}...`;
+                    
+                    // Load the first track
+                    await loadTrack(currentTrackIndex);
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Error fetching or processing M3U file:', error);
+                    playerStatus.textContent = 'Failed to load playlist: ' + error.message;
+                    loadingIndicator.style.display = 'none';
+                    return false;
+                }
+            };
+            
+            // Load a specific track by index
+            const loadTrack = async (index) => {
+                if (index < 0 || index >= playlistTracks.length) {
+                    console.error('Invalid track index:', index);
+                    return false;
+                }
+                
+                const track = playlistTracks[index];
+                const trackUrl = track.url;
+                
+                loadingText.textContent = `Loading track ${index + 1} of ${playlistTracks.length}...`;
+                console.log(`Loading track: ${trackUrl}`);
+                
+                try {
+                    // Setup audio context for visualization on first play
+                    if (!audioContext) {
+                        setupAudioContext();
+                    }
+                    
+                    // Check if we can use HLS.js for better streaming
+                    if (typeof trackUrl === 'string' && trackUrl.includes('.m3u8') && Hls.isSupported()) {
+                        if (window.hls) {
+                            window.hls.destroy();
+                        }
+                        
+                        window.hls = new Hls({
+                            xhrSetup: function(xhr) {
+                                xhr.withCredentials = false;
+                            }
+                        });
+                        
+                        window.hls.loadSource(trackUrl);
+                        window.hls.attachMedia(audio);
+                        
+                        return new Promise((resolve) => {
+                            window.hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                                window.hls.startLoad(-1);
+                                prepareToPlay();
+                                resolve(true);
+                            });
+                            
+                            window.hls.on(Hls.Events.ERROR, function(event, data) {
+                                if (data.fatal) {
+                                    playerStatus.textContent = `Track ${index + 1} error: ${data.type}`;
+                                    loadingIndicator.style.display = 'none';
+                                    resolve(false);
+                                }
+                            });
+                        });
+                    } else {
+                        // For non-HLS streaming, convert OGG to MP3 if needed
+                        loadingText.textContent = `Processing track ${index + 1}...`;
+                        
+                        // Direct streaming for MP3, AAC, etc.
+                        audio.src = trackUrl;
+                        
+                        // Wait for audio to load metadata to check format
+                        return new Promise((resolve) => {
+                            audio.onloadedmetadata = async () => {
+                                // If we're able to get the source type via a MediaSource
+                                if (audio.srcObject && audio.srcObject.type) {
+                                    console.log(`Track ${index + 1} format: ${audio.srcObject.type}`);
+                                } else {
+                                    // Use file extension as a fallback
+                                    const extension = trackUrl.split('.').pop().toLowerCase();
+                                    console.log(`Track ${index + 1} extension: ${extension}`);
+                                    
+                                    // If it's OGG, we'll convert to MP3
+                                    if (extension === 'ogg' || extension === 'opus') {
+                                        loadingText.textContent = `Converting track ${index + 1} to MP3...`;
+                                        try {
+                                            const mp3Url = await fetchAndConvertAudio(trackUrl);
+                                            audio.src = mp3Url;
+                                        } catch (error) {
+                                            console.error('Failed to convert to MP3:', error);
+                                        }
+                                    }
+                                }
+                                
+                                prepareToPlay();
+                                resolve(true);
+                            };
+                            
+                            audio.onerror = () => {
+                                console.error(`Error loading track ${index + 1}`);
+                                resolve(false);
+                            };
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error loading track:', error);
+                    playerStatus.textContent = `Failed to load track ${index + 1}: ${error.message}`;
+                    return false;
+                }
+            };
+            
+            // Parse M3U file content
+            const parseM3U = (content) => {
+                const lines = content.split('\n');
+                const tracks = [];
+                let trackTitle = 'Unknown Track';
+                
+                console.log('Parsing M3U content...');
+                console.log('First few lines:', lines.slice(0, 5));
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    
+                    // Skip empty lines
+                    if (line === '') continue;
+                    
+                    // Extract track titles from EXTINF lines
+                    if (line.startsWith('#EXTINF:')) {
+                        const titleMatch = line.match(/,(.+)$/);
+                        if (titleMatch && titleMatch[1]) {
+                            trackTitle = titleMatch[1].trim();
+                        }
+                        continue;
+                    }
+                    
+                    // Skip other comment/directive lines
+                    if (line.startsWith('#')) continue;
+                    
+                    // Add valid URL to the list
+                    tracks.push({
+                        url: line,
+                        title: trackTitle
+                    });
+                    
+                    // Reset title for next track
+                    trackTitle = 'Unknown Track';
+                }
+                
+                if (tracks.length > 0) {
+                    console.log('First track:', tracks[0]);
+                }
+                
+                return tracks;
+            };
+            
+            // Prepare to play
+            const prepareToPlay = () => {
+                loadingText.textContent = 'Starting stream...';
+                
+                // Setup audio context for visualization on first play
+                if (!audioContext) {
+                    setupAudioContext();
+                }
+            };
+            
+            // Update the track info display
+            const updateTrackInfo = () => {
+                if (currentTrackIndex >= 0 && currentTrackIndex < playlistTracks.length) {
+                    const track = playlistTracks[currentTrackIndex];
+                    const trackTitle = track.title || `Track ${currentTrackIndex + 1}`;
+                    nowPlaying.textContent = `${trackTitle} (${currentTrackIndex + 1} of ${playlistTracks.length})`;
+                    playerStatus.textContent = 'Playing';
+                    
+                    // Try to determine audio format
+                    const extension = track.url.split('.').pop().toLowerCase();
+                    let format = 'Unknown';
+                    
+                    if (extension === 'mp3') {
+                        format = 'MP3';
+                    } else if (extension === 'ogg' || extension === 'oga') {
+                        format = 'OGG';
+                    } else if (extension === 'wav') {
+                        format = 'WAV';
+                    } else if (extension === 'aac' || extension === 'm4a') {
+                        format = 'AAC';
+                    } else if (extension === 'flac') {
+                        format = 'FLAC';
+                    } else if (extension === 'wma') {
+                        format = 'WMA';
+                    } else if (extension === 'm3u' || extension === 'm3u8') {
+                        format = 'Playlist';
+                    } else if (originalFormat) {
+                        format = originalFormat.split('/')[1].toUpperCase();
+                    }
+                    
+                    console.log(`Now playing: ${track.url}`);
+                    console.log(`Original format: ${format}, Playing as: MP3`);
+                }
+            };
+            
+            // Play next track
+            const playNextTrack = async () => {
+                currentTrackIndex = (currentTrackIndex + 1) % playlistTracks.length;
+                playerStatus.textContent = `Loading track ${currentTrackIndex + 1} of ${playlistTracks.length}...`;
+                loadingIndicator.style.display = 'flex';
+                
+                console.log(`Moving to next track: ${currentTrackIndex}`);
+                
+                const success = await loadTrack(currentTrackIndex);
+                if (success) {
+                    try {
+                        await audio.play();
+                        updateTrackInfo();
+                    } catch (error) {
+                        console.error('Error playing next track:', error);
+                        playerStatus.textContent = 'Failed to play next track: ' + error.message;
+                        loadingIndicator.style.display = 'none';
+                        
+                        // Try the next track if current one fails
+                        setTimeout(() => playNextTrack(), 3000);
+                    }
+                } else {
+                    // If track loading failed, try the next one
+                    console.log('Track loading failed, trying next track');
+                    setTimeout(() => playNextTrack(), 3000);
+                }
+            };
+            
+            // Handle play/pause
+            const togglePlay = async () => {
+                // Resume audio context if it was suspended (autoplay policy)
+                if (audioContext && audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                
+                if (audio.paused) {
+                    // If this is the first play, fetch the playlist
+                    if (!audio.src || audio.src === '' || playlistTracks.length === 0) {
+                        const success = await fetchAndProcessM3U();
+                        if (!success) return;
+                    }
+                    
+                    try {
+                        loadingIndicator.style.display = 'flex';
+                        loadingText.textContent = 'Buffering audio...';
+                        
+                        // Play the audio
+                        await audio.play();
+                        
+                        // Start visualization
+                        updateVisualizer();
+                        
+                        // Update UI
+                        playBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                        playBtn.title = 'Pause';
+                        updateTrackInfo();
+                        loadingIndicator.style.display = 'none';
+                    } catch (error) {
+                        console.error('Error playing audio:', error);
+                        playerStatus.textContent = 'Failed to play: ' + error.message;
+                        loadingIndicator.style.display = 'none';
+                        
+                        // If play fails, try the next track
+                        setTimeout(() => playNextTrack(), 3000);
+                    }
+                } else {
+                    // Pause playback
+                    audio.pause();
+                    
+                    // Stop visualization
+                    if (animationFrame) {
+                        cancelAnimationFrame(animationFrame);
+                    }
+                    
+                    // Update UI
+                    playBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                    playBtn.title = 'Play';
+                    playerStatus.textContent = 'Paused';
+                }
+            };
+            
+            // Stop playback
+            const stopPlayback = () => {
+                audio.pause();
+                audio.currentTime = 0;
+                
+                // Stop visualization
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                }
+                
+                // Reset visualizer bars
+                for (let i = 0; i < visualizerBars.length; i++) {
+                    visualizerBars[i].style.height = '5px';
+                }
+                
+                // Reset to first track
+                currentTrackIndex = 0;
+                
+                // Update UI
+                playBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                playBtn.title = 'Play';
+                playerStatus.textContent = 'Stopped';
+                nowPlaying.textContent = 'Not playing';
+                loadingIndicator.style.display = 'none';
+            };
+            
+            // Event listeners
+            playBtn.addEventListener('click', togglePlay);
+            stopBtn.addEventListener('click', stopPlayback);
+            
+            volumeSlider.addEventListener('input', () => {
+                audio.volume = volumeSlider.value;
+            });
+            
+            // Set initial volume
+            audio.volume = volumeSlider.value;
+            
+            // Handle audio element events
+            audio.addEventListener('playing', () => {
+                playerStatus.textContent = 'Playing';
+                loadingIndicator.style.display = 'none';
+                updateTrackInfo();
+            });
+            
+            audio.addEventListener('waiting', () => {
+                playerStatus.textContent = 'Buffering...';
+                loadingIndicator.style.display = 'flex';
+                loadingText.textContent = 'Buffering audio...';
+            });
+            
+            // Add ended event to automatically play next track
+            audio.addEventListener('ended', () => {
+                console.log('Track ended, playing next track');
+                playNextTrack();
+            });
+            
+            audio.addEventListener('error', (e) => {
+                console.error('Audio error:', e);
+                const errorMessage = audio.error ? audio.error.message : 'Unknown error';
+                playerStatus.textContent = 'Error: ' + errorMessage;
+                loadingIndicator.style.display = 'none';
+                
+                // Try to play next track on error
+                console.log('Error occurred, trying next track');
+                setTimeout(playNextTrack, 2000); // Wait 2 seconds before trying next track
+                
+                // Reset play button
+                playBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                playBtn.title = 'Play';
+            });
+        });
+    </script>
+</body>
+</html>
