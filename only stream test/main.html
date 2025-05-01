@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Theme Audio Player</title>
+    <title>Dark Theme MP3 Audio Player</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -27,7 +27,7 @@
         }
         
         .container {
-            width: 80%;
+            width: 90%;
             max-width: 500px;
             background-color: var(--secondary-color);
             border-radius: 10px;
@@ -181,18 +181,45 @@
             font-size: 14px;
             color: #a7a7a7;
         }
+        
+        .skip-btns {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .skip-btn {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            color: var(--text-color);
+            padding: 5px 10px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        
+        .skip-btn:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .format-display {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="player-header">
-            <h1>Radio Stream Player</h1>
-            <p>Listen to your favorite stream in high quality</p>
+            <h1>MP3 Radio Stream Player</h1>
+            <p>Listen to your favorite stream converted to MP3</p>
         </div>
         
         <div class="loading" id="loadingIndicator">
             <div class="loading-spinner"></div>
-            <span id="loadingText">Processing stream... Please wait</span>
+            <span id="loadingText">Loading stream...</span>
         </div>
         
         <div class="player-status" id="playerStatus">
@@ -203,6 +230,11 @@
             <div class="visualizer" id="audioVisualizer">
                 <!-- Bars will be added dynamically with JavaScript -->
             </div>
+        </div>
+        
+        <div class="skip-btns">
+            <button class="skip-btn" id="prevBtn">Previous</button>
+            <button class="skip-btn" id="nextBtn">Next</button>
         </div>
         
         <div class="player-controls">
@@ -228,10 +260,15 @@
         <div class="now-playing" id="nowPlaying">
             Not playing
         </div>
+        
+        <div class="format-display" id="formatDisplay">
+            Format: None
+        </div>
     </div>
 
+    <!-- Load lamejs library for MP3 conversion -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.8/hls.min.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Elements
@@ -243,84 +280,286 @@
             const loadingText = document.getElementById('loadingText');
             const nowPlaying = document.getElementById('nowPlaying');
             const visualizerContainer = document.getElementById('audioVisualizer');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const formatDisplay = document.getElementById('formatDisplay');
             
-            // Create audio element
-            const audio = new Audio();
+            // Create audio elements
+            const audio = new Audio(); // Main audio element for playback
+            const tempAudio = new Audio(); // Temporary audio for format detection
             audio.crossOrigin = "anonymous";
+            tempAudio.crossOrigin = "anonymous";
             
             // Stream URL
-            const streamUrl = 'https://www.streamadqfm.store/%D8%A7%D9%84%D8%AD%D8%B5%D8%B1%D9%8A.m3u';
+            const streamUrl = 'https://www.streamadqfm.store/output.m3u';
             
-            // Audio context for visualization and format conversion
-            let audioContext;
-            let analyser;
-            let dataArray;
-            let sourceNode;
+            // Playlist tracks
+            let playlistTracks = [];
+            let currentTrackIndex = 0;
             let animationFrame;
-            let visualizerBars = [];
-            let audioProcessor;
-            let mp3Encoder;
-            let mp3Data = [];
-            let originalFormat = '';
+            let isConverting = false;
+            let mp3Cache = {}; // Cache for converted MP3 files
             
             // Create visualizer bars
             const createVisualizer = () => {
                 // Clear existing bars
                 visualizerContainer.innerHTML = '';
-                visualizerBars = [];
                 
-                // Create new bars
-                const barCount = 50;
+                // Create bars
+                const barCount = 40;
                 for (let i = 0; i < barCount; i++) {
                     const bar = document.createElement('div');
                     bar.className = 'visualizer-bar';
                     visualizerContainer.appendChild(bar);
-                    visualizerBars.push(bar);
                 }
             };
             
             createVisualizer();
             
-            // Setup audio context
-            const setupAudioContext = () => {
-                if (audioContext) return;
+            // Simple animation for visualizer
+            const updateVisualizer = () => {
+                if (!audio.paused) {
+                    const bars = visualizerContainer.querySelectorAll('.visualizer-bar');
+                    
+                    // Create random heights for bars
+                    for (let i = 0; i < bars.length; i++) {
+                        const height = Math.random() * 100;
+                        bars[i].style.height = `${height}%`;
+                    }
+                    
+                    // Continue animation
+                    animationFrame = requestAnimationFrame(updateVisualizer);
+                }
+            };
+            
+            // Helper function to extract file extension
+            const getFileExtension = (url) => {
+                // Remove query strings
+                const cleanUrl = url.split('?')[0];
+                // Get the part after the last dot
+                return cleanUrl.split('.').pop().toLowerCase();
+            };
+            
+            // Function to detect audio format
+            const detectAudioFormat = (url) => {
+                const extension = getFileExtension(url);
+                switch (extension) {
+                    case 'mp3':
+                        return 'MP3';
+                    case 'ogg':
+                    case 'oga':
+                        return 'OGG';
+                    case 'wav':
+                        return 'WAV';
+                    case 'aac':
+                    case 'm4a':
+                        return 'AAC';
+                    case 'flac':
+                        return 'FLAC';
+                    case 'wma':
+                        return 'WMA';
+                    default:
+                        return 'Unknown';
+                }
+            };
+            
+            // Convert ogg/opus to mp3 using lamejs
+            const convertToMp3 = async (audioUrl) => {
+                // Check if we already converted this audio
+                if (mp3Cache[audioUrl]) {
+                    console.log('Using cached MP3 for:', audioUrl);
+                    return mp3Cache[audioUrl];
+                }
+                
+                isConverting = true;
+                playerStatus.textContent = 'Converting to MP3...';
+                loadingIndicator.style.display = 'flex';
+                loadingText.textContent = 'Converting audio to MP3 format...';
                 
                 try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    analyser = audioContext.createAnalyser();
-                    analyser.fftSize = 256;
+                    // Fetch the audio file
+                    const response = await fetch(audioUrl);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch audio: ${response.status}`);
+                    }
                     
-                    sourceNode = audioContext.createMediaElementSource(audio);
-                    sourceNode.connect(analyser);
-                    analyser.connect(audioContext.destination);
+                    const arrayBuffer = await response.arrayBuffer();
                     
-                    const bufferLength = analyser.frequencyBinCount;
-                    dataArray = new Uint8Array(bufferLength);
-                } catch (e) {
-                    console.error('Web Audio API not supported:', e);
-                    playerStatus.textContent = 'Audio visualization not supported in your browser';
+                    // Create a blob and object URL for the source audio
+                    const sourceBlob = new Blob([arrayBuffer]);
+                    const sourceUrl = URL.createObjectURL(sourceBlob);
+                    
+                    // Use a simpler approach with a temporary audio element
+                    return new Promise((resolve, reject) => {
+                        tempAudio.src = sourceUrl;
+                        tempAudio.onloadedmetadata = async () => {
+                            try {
+                                // Create an audio context
+                                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                                
+                                // Decode the audio data
+                                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                                
+                                // Check if lamejs is available
+                                if (typeof lamejs === 'undefined') {
+                                    console.error('lamejs library not found. Using original format.');
+                                    isConverting = false;
+                                    return resolve(sourceUrl);
+                                }
+                                
+                                const channels = audioBuffer.numberOfChannels;
+                                const sampleRate = audioBuffer.sampleRate;
+                                
+                                // Create MP3 encoder
+                                const mp3Encoder = new lamejs.Mp3Encoder(channels, sampleRate, 128);
+                                const mp3Data = [];
+                                
+                                console.log(`Converting from ${detectAudioFormat(audioUrl)} to MP3...`);
+                                console.log(`Audio info: Channels: ${channels}, Sample Rate: ${sampleRate}Hz`);
+                                
+                                // Get audio data
+                                const left = audioBuffer.getChannelData(0);
+                                let right = null;
+                                
+                                if (channels > 1) {
+                                    right = audioBuffer.getChannelData(1);
+                                }
+                                
+                                // Convert Float32Array to Int16Array
+                                const sampleBlockSize = 1152; // Must be a multiple of 576
+                                const leftInt16 = new Int16Array(left.length);
+                                let rightInt16 = null;
+                                
+                                for (let i = 0; i < left.length; i++) {
+                                    // Convert Float32 to Int16
+                                    leftInt16[i] = Math.max(-32768, Math.min(32767, Math.floor(left[i] * 32768)));
+                                }
+                                
+                                if (right) {
+                                    rightInt16 = new Int16Array(right.length);
+                                    for (let i = 0; i < right.length; i++) {
+                                        rightInt16[i] = Math.max(-32768, Math.min(32767, Math.floor(right[i] * 32768)));
+                                    }
+                                }
+                                
+                                // Update loading message periodically during encoding
+                                let totalChunks = Math.ceil(leftInt16.length / sampleBlockSize);
+                                let processedChunks = 0;
+                                
+                                // Processing chunks in batches to avoid blocking the UI
+                                const processChunks = (startIdx) => {
+                                    const endIdx = Math.min(startIdx + 10, Math.ceil(leftInt16.length / sampleBlockSize));
+                                    
+                                    for (let i = startIdx; i < endIdx; i++) {
+                                        const start = i * sampleBlockSize;
+                                        const end = Math.min(start + sampleBlockSize, leftInt16.length);
+                                        
+                                        let leftChunk = leftInt16.subarray(start, end);
+                                        let mp3buf;
+                                        
+                                        if (channels > 1 && rightInt16) {
+                                            let rightChunk = rightInt16.subarray(start, end);
+                                            mp3buf = mp3Encoder.encodeBuffer(leftChunk, rightChunk);
+                                        } else {
+                                            mp3buf = mp3Encoder.encodeBuffer(leftChunk);
+                                        }
+                                        
+                                        if (mp3buf.length > 0) {
+                                            mp3Data.push(mp3buf);
+                                        }
+                                        
+                                        processedChunks++;
+                                    }
+                                    
+                                    // Update loading status
+                                    const percentComplete = Math.floor((processedChunks / totalChunks) * 100);
+                                    loadingText.textContent = `Converting to MP3: ${percentComplete}%`;
+                                    
+                                    if (endIdx < Math.ceil(leftInt16.length / sampleBlockSize)) {
+                                        // Continue processing in the next frame
+                                        setTimeout(() => processChunks(endIdx), 0);
+                                    } else {
+                                        // Finalize encoding
+                                        let finalMp3 = mp3Encoder.flush();
+                                        if (finalMp3.length > 0) {
+                                            mp3Data.push(finalMp3);
+                                        }
+                                        
+                                        // Create MP3 blob and URL
+                                        const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+                                        const mp3Url = URL.createObjectURL(mp3Blob);
+                                        
+                                        console.log('MP3 conversion completed successfully');
+                                        
+                                        // Cache the result
+                                        mp3Cache[audioUrl] = mp3Url;
+                                        
+                                        isConverting = false;
+                                        resolve(mp3Url);
+                                    }
+                                };
+                                
+                                // Start processing chunks
+                                processChunks(0);
+                                
+                            } catch (error) {
+                                console.error('Error during MP3 conversion:', error);
+                                isConverting = false;
+                                resolve(sourceUrl); // Return original source on error
+                            }
+                        };
+                        
+                        tempAudio.onerror = () => {
+                            console.error('Error loading audio for conversion');
+                            isConverting = false;
+                            resolve(audioUrl); // Return original URL on error
+                        };
+                    });
+                    
+                } catch (error) {
+                    console.error('Error fetching audio for conversion:', error);
+                    isConverting = false;
+                    return audioUrl; // Return original URL on error
                 }
             };
             
-            // Update visualizer animation
-            const updateVisualizer = () => {
-                if (!audioContext || !analyser) return;
+            // Parse M3U file content
+            const parseM3U = (content) => {
+                const lines = content.split('\n');
+                const tracks = [];
+                let trackTitle = 'Unknown Track';
                 
-                analyser.getByteFrequencyData(dataArray);
-                
-                for (let i = 0; i < visualizerBars.length; i++) {
-                    const index = Math.floor(i * (dataArray.length / visualizerBars.length));
-                    const value = dataArray[index] / 255;
-                    const height = value * 100;
-                    visualizerBars[i].style.height = `${height}%`;
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    
+                    // Skip empty lines
+                    if (line === '') continue;
+                    
+                    // Extract track titles from EXTINF lines
+                    if (line.startsWith('#EXTINF:')) {
+                        const titleMatch = line.match(/,(.+)$/);
+                        if (titleMatch && titleMatch[1]) {
+                            trackTitle = titleMatch[1].trim();
+                        }
+                        continue;
+                    }
+                    
+                    // Skip other comment/directive lines
+                    if (line.startsWith('#')) continue;
+                    
+                    // Add valid URL to the list
+                    tracks.push({
+                        url: line,
+                        title: trackTitle,
+                        format: detectAudioFormat(line)
+                    });
+                    
+                    // Reset title for next track
+                    trackTitle = 'Unknown Track';
                 }
                 
-                animationFrame = requestAnimationFrame(updateVisualizer);
+                return tracks;
             };
-            
-            // Store the playlist tracks
-            let playlistTracks = [];
-            let currentTrackIndex = 0;
             
             // Fetch and process the M3U file
             const fetchAndProcessM3U = async () => {
@@ -370,144 +609,46 @@
                 
                 const track = playlistTracks[index];
                 const trackUrl = track.url;
+                const trackFormat = track.format;
                 
                 loadingText.textContent = `Loading track ${index + 1} of ${playlistTracks.length}...`;
                 console.log(`Loading track: ${trackUrl}`);
                 
                 try {
-                    // Setup audio context for visualization on first play
-                    if (!audioContext) {
-                        setupAudioContext();
+                    formatDisplay.textContent = `Original Format: ${trackFormat}`;
+                    
+                    // Convert to MP3 if not already in MP3 format
+                    if (trackFormat !== 'MP3') {
+                        loadingText.textContent = `Converting track ${index + 1} to MP3...`;
+                        const mp3Url = await convertToMp3(trackUrl);
+                        audio.src = mp3Url;
+                        formatDisplay.textContent = `Original Format: ${trackFormat} → Converted to MP3`;
+                    } else {
+                        // Already MP3, use directly
+                        audio.src = trackUrl;
+                        formatDisplay.textContent = `Format: MP3 (Native)`;
                     }
                     
-                    // Check if we can use HLS.js for better streaming
-                    if (typeof trackUrl === 'string' && trackUrl.includes('.m3u8') && Hls.isSupported()) {
-                        if (window.hls) {
-                            window.hls.destroy();
-                        }
+                    // Force load
+                    audio.load();
+                    
+                    return new Promise((resolve) => {
+                        audio.oncanplay = () => {
+                            loadingIndicator.style.display = 'none';
+                            updateTrackInfo();
+                            resolve(true);
+                        };
                         
-                        window.hls = new Hls({
-                            xhrSetup: function(xhr) {
-                                xhr.withCredentials = false;
-                            }
-                        });
-                        
-                        window.hls.loadSource(trackUrl);
-                        window.hls.attachMedia(audio);
-                        
-                        return new Promise((resolve) => {
-                            window.hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                                window.hls.startLoad(-1);
-                                prepareToPlay();
-                                resolve(true);
-                            });
-                            
-                            window.hls.on(Hls.Events.ERROR, function(event, data) {
-                                if (data.fatal) {
-                                    playerStatus.textContent = `Track ${index + 1} error: ${data.type}`;
-                                    loadingIndicator.style.display = 'none';
-                                    resolve(false);
-                                }
-                            });
-                        });
-                    } else {
-                        // For non-HLS streaming, convert OGG to MP3 if needed
-                        loadingText.textContent = `Processing track ${index + 1}...`;
-                        
-                        // Direct streaming for MP3, AAC, etc.
-                        audio.src = trackUrl;
-                        
-                        // Wait for audio to load metadata to check format
-                        return new Promise((resolve) => {
-                            audio.onloadedmetadata = async () => {
-                                // If we're able to get the source type via a MediaSource
-                                if (audio.srcObject && audio.srcObject.type) {
-                                    console.log(`Track ${index + 1} format: ${audio.srcObject.type}`);
-                                } else {
-                                    // Use file extension as a fallback
-                                    const extension = trackUrl.split('.').pop().toLowerCase();
-                                    console.log(`Track ${index + 1} extension: ${extension}`);
-                                    
-                                    // If it's OGG, we'll convert to MP3
-                                    if (extension === 'ogg' || extension === 'opus') {
-                                        loadingText.textContent = `Converting track ${index + 1} to MP3...`;
-                                        try {
-                                            const mp3Url = await fetchAndConvertAudio(trackUrl);
-                                            audio.src = mp3Url;
-                                        } catch (error) {
-                                            console.error('Failed to convert to MP3:', error);
-                                        }
-                                    }
-                                }
-                                
-                                prepareToPlay();
-                                resolve(true);
-                            };
-                            
-                            audio.onerror = () => {
-                                console.error(`Error loading track ${index + 1}`);
-                                resolve(false);
-                            };
-                        });
-                    }
+                        audio.onerror = () => {
+                            console.error(`Error loading track ${index + 1}`);
+                            loadingIndicator.style.display = 'none';
+                            resolve(false);
+                        };
+                    });
                 } catch (error) {
                     console.error('Error loading track:', error);
                     playerStatus.textContent = `Failed to load track ${index + 1}: ${error.message}`;
                     return false;
-                }
-            };
-            
-            // Parse M3U file content
-            const parseM3U = (content) => {
-                const lines = content.split('\n');
-                const tracks = [];
-                let trackTitle = 'Unknown Track';
-                
-                console.log('Parsing M3U content...');
-                console.log('First few lines:', lines.slice(0, 5));
-                
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    
-                    // Skip empty lines
-                    if (line === '') continue;
-                    
-                    // Extract track titles from EXTINF lines
-                    if (line.startsWith('#EXTINF:')) {
-                        const titleMatch = line.match(/,(.+)$/);
-                        if (titleMatch && titleMatch[1]) {
-                            trackTitle = titleMatch[1].trim();
-                        }
-                        continue;
-                    }
-                    
-                    // Skip other comment/directive lines
-                    if (line.startsWith('#')) continue;
-                    
-                    // Add valid URL to the list
-                    tracks.push({
-                        url: line,
-                        title: trackTitle
-                    });
-                    
-                    // Reset title for next track
-                    trackTitle = 'Unknown Track';
-                }
-                
-                if (tracks.length > 0) {
-                    console.log('First track:', tracks[0]);
-                }
-                
-                return tracks;
-            };
-            
-            // Prepare to play
-            const prepareToPlay = () => {
-                loadingText.textContent = 'Starting stream...';
-                
-                // Setup audio context for visualization on first play
-                if (!audioContext) {
-                    setupAudioContext();
                 }
             };
             
@@ -517,37 +658,19 @@
                     const track = playlistTracks[currentTrackIndex];
                     const trackTitle = track.title || `Track ${currentTrackIndex + 1}`;
                     nowPlaying.textContent = `${trackTitle} (${currentTrackIndex + 1} of ${playlistTracks.length})`;
-                    playerStatus.textContent = 'Playing';
-                    
-                    // Try to determine audio format
-                    const extension = track.url.split('.').pop().toLowerCase();
-                    let format = 'Unknown';
-                    
-                    if (extension === 'mp3') {
-                        format = 'MP3';
-                    } else if (extension === 'ogg' || extension === 'oga') {
-                        format = 'OGG';
-                    } else if (extension === 'wav') {
-                        format = 'WAV';
-                    } else if (extension === 'aac' || extension === 'm4a') {
-                        format = 'AAC';
-                    } else if (extension === 'flac') {
-                        format = 'FLAC';
-                    } else if (extension === 'wma') {
-                        format = 'WMA';
-                    } else if (extension === 'm3u' || extension === 'm3u8') {
-                        format = 'Playlist';
-                    } else if (originalFormat) {
-                        format = originalFormat.split('/')[1].toUpperCase();
-                    }
-                    
-                    console.log(`Now playing: ${track.url}`);
-                    console.log(`Original format: ${format}, Playing as: MP3`);
+                    playerStatus.textContent = audio.paused ? 'Paused' : 'Playing';
                 }
             };
             
             // Play next track
             const playNextTrack = async () => {
+                // Don't change tracks if currently converting
+                if (isConverting) {
+                    console.log('Conversion in progress, waiting...');
+                    setTimeout(playNextTrack, 1000);
+                    return;
+                }
+                
                 currentTrackIndex = (currentTrackIndex + 1) % playlistTracks.length;
                 playerStatus.textContent = `Loading track ${currentTrackIndex + 1} of ${playlistTracks.length}...`;
                 loadingIndicator.style.display = 'flex';
@@ -559,6 +682,7 @@
                     try {
                         await audio.play();
                         updateTrackInfo();
+                        updateVisualizer();
                     } catch (error) {
                         console.error('Error playing next track:', error);
                         playerStatus.textContent = 'Failed to play next track: ' + error.message;
@@ -574,13 +698,37 @@
                 }
             };
             
-            // Handle play/pause
-            const togglePlay = async () => {
-                // Resume audio context if it was suspended (autoplay policy)
-                if (audioContext && audioContext.state === 'suspended') {
-                    await audioContext.resume();
+            // Play previous track
+            const playPrevTrack = async () => {
+                // Don't change tracks if currently converting
+                if (isConverting) {
+                    console.log('Conversion in progress, waiting...');
+                    setTimeout(playPrevTrack, 1000);
+                    return;
                 }
                 
+                currentTrackIndex = (currentTrackIndex - 1 + playlistTracks.length) % playlistTracks.length;
+                playerStatus.textContent = `Loading track ${currentTrackIndex + 1} of ${playlistTracks.length}...`;
+                loadingIndicator.style.display = 'flex';
+                
+                console.log(`Moving to previous track: ${currentTrackIndex}`);
+                
+                const success = await loadTrack(currentTrackIndex);
+                if (success) {
+                    try {
+                        await audio.play();
+                        updateTrackInfo();
+                        updateVisualizer();
+                    } catch (error) {
+                        console.error('Error playing previous track:', error);
+                        playerStatus.textContent = 'Failed to play track: ' + error.message;
+                        loadingIndicator.style.display = 'none';
+                    }
+                }
+            };
+            
+            // Handle play/pause
+            const togglePlay = async () => {
                 if (audio.paused) {
                     // If this is the first play, fetch the playlist
                     if (!audio.src || audio.src === '' || playlistTracks.length === 0) {
@@ -590,7 +738,7 @@
                     
                     try {
                         loadingIndicator.style.display = 'flex';
-                        loadingText.textContent = 'Buffering audio...';
+                        loadingText.textContent = 'Starting playback...';
                         
                         // Play the audio
                         await audio.play();
@@ -632,30 +780,34 @@
                 audio.pause();
                 audio.currentTime = 0;
                 
+                // Reset to first track
+                currentTrackIndex = 0;
+                
                 // Stop visualization
                 if (animationFrame) {
                     cancelAnimationFrame(animationFrame);
                 }
                 
                 // Reset visualizer bars
-                for (let i = 0; i < visualizerBars.length; i++) {
-                    visualizerBars[i].style.height = '5px';
+                const bars = visualizerContainer.querySelectorAll('.visualizer-bar');
+                for (let i = 0; i < bars.length; i++) {
+                    bars[i].style.height = '5px';
                 }
-                
-                // Reset to first track
-                currentTrackIndex = 0;
                 
                 // Update UI
                 playBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
                 playBtn.title = 'Play';
                 playerStatus.textContent = 'Stopped';
                 nowPlaying.textContent = 'Not playing';
+                formatDisplay.textContent = 'Format: None';
                 loadingIndicator.style.display = 'none';
             };
             
             // Event listeners
             playBtn.addEventListener('click', togglePlay);
             stopBtn.addEventListener('click', stopPlayback);
+            nextBtn.addEventListener('click', playNextTrack);
+            prevBtn.addEventListener('click', playPrevTrack);
             
             volumeSlider.addEventListener('input', () => {
                 audio.volume = volumeSlider.value;
@@ -685,7 +837,9 @@
             
             audio.addEventListener('error', (e) => {
                 console.error('Audio error:', e);
-                const errorMessage = audio.error ? audio.error.message : 'Unknown error';
+                const errorCode = audio.error ? audio.error.code : 'Unknown';
+                const errorMessage = audio.error ? (audio.error.message || errorCodeToMessage(errorCode)) : 'Unknown error';
+                
                 playerStatus.textContent = 'Error: ' + errorMessage;
                 loadingIndicator.style.display = 'none';
                 
@@ -697,6 +851,47 @@
                 playBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
                 playBtn.title = 'Play';
             });
+            
+            // Helper function to convert error codes to messages
+            function errorCodeToMessage(code) {
+                switch(code) {
+                    case 1: return 'Fetching process aborted';
+                    case 2: return 'Network error';
+                    case 3: return 'Decoding error';
+                    case 4: return 'Media source not supported';
+                    default: return 'Unknown error';
+                }
+            }
+            
+            // Mobile-specific adjustments
+            function isMobileDevice() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            }
+            
+            if (isMobileDevice()) {
+                console.log('Mobile device detected, applying optimizations');
+                
+                // Add event listeners for touchend to improve mobile responsiveness
+                playBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault(); // Prevent double-firing with click event
+                    togglePlay();
+                });
+                
+                stopBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    stopPlayback();
+                });
+                
+                nextBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    playNextTrack();
+                });
+                
+                prevBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    playPrevTrack();
+                });
+            }
         });
     </script>
 </body>
