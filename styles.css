@@ -1,0 +1,733 @@
+/* 
+ * Quran App CSS - Enhanced Version
+ * A modern, optimized stylesheet for Quran Radio application
+ */
+
+/* ======= VARIABLES ======= */
+:root {
+  /* Color palette */
+  --color-primary: #4CAF50;
+  --color-primary-light: #45a049;
+  --color-primary-dark: #3c8c40;
+  --color-background: #1a1a1a;
+  --color-background-gradient-start: #2c3e50;
+  --color-background-gradient-end: #1a1a1a;
+  --color-text: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.8);
+  
+  /* Transparency levels */
+  --transparency-low: rgba(255, 255, 255, 0.05);
+  --transparency-medium: rgba(255, 255, 255, 0.1);
+  --transparency-high: rgba(255, 255, 255, 0.2);
+  
+  /* Shadows */
+  --shadow-small: 0 4px 6px rgba(0, 0, 0, 0.2);
+  --shadow-medium: 0 8px 15px rgba(0, 0, 0, 0.3);
+  --shadow-large: 0 12px 28px rgba(0, 0, 0, 0.4);
+  
+  /* Borders */
+  --border-thin: 1px solid rgba(255, 255, 255, 0.1);
+  --border-medium: 2px solid rgba(255, 255, 255, 0.1);
+  
+  /* Border radius */
+  --radius-small: 8px;
+  --radius-medium: 12px;
+  --radius-large: 20px;
+  --radius-circle: 50%;
+  
+  /* Animation speeds */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* Spacing */
+  --spacing-xs: 5px;
+  --spacing-sm: 10px;
+  --spacing-md: 15px;
+  --spacing-lg: 20px;
+  --spacing-xl: 40px;
+  
+  /* Font sizes */
+  --font-size-xs: 0.8rem;
+  --font-size-sm: 0.9rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.2rem;
+  --font-size-xl: 1.5rem;
+  --font-size-xxl: 2rem;
+  --font-size-hero: 2.5rem;
+}
+
+/* ======= RESET ======= */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+/* Remove default list styles */
+ul, ol {
+  list-style: none;
+}
+
+/* Remove default button styles */
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Remove default link styles */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ======= BASE STYLES ======= */
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 60px 0;
+  overflow: hidden;
+  position: relative;
+  background: radial-gradient(circle, var(--color-background-gradient-start), var(--color-background-gradient-end));
+}
+
+h1 {
+  color: var(--color-text);
+  font-size: var(--font-size-hero);
+  margin-bottom: var(--spacing-lg);
+  font-weight: 700;
+  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+  margin-top: 60px;
+}
+
+/* ======= AUDIO CONTROLS ======= */
+audio {
+  width: 100%;
+  max-width: 500px;
+  border-radius: var(--radius-medium);
+  outline: none;
+  margin: var(--spacing-lg) 0;
+  filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.5));
+}
+
+audio::-webkit-media-controls-panel {
+  background-color: #333;
+  border-radius: var(--radius-medium);
+}
+
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-mute-button {
+  background-color: var(--color-primary);
+  border-radius: var(--radius-circle);
+}
+
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+  color: var(--color-text);
+}
+
+/* ======= BUTTONS ======= */
+button {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-lg);
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius-small);
+  cursor: pointer;
+  transition: background-color var(--transition-medium), 
+              transform var(--transition-fast), 
+              box-shadow var(--transition-medium);
+  margin-top: var(--spacing-md);
+  box-shadow: var(--shadow-small);
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+button:hover {
+  background-color: var(--color-primary-light);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-medium);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-small);
+}
+
+button:focus {
+  outline: 2px solid rgba(76, 175, 80, 0.4);
+  outline-offset: 2px;
+}
+
+/* ======= TRACKS AND STATUS ======= */
+#currentTrack {
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  margin-top: var(--spacing-lg);
+  color: var(--color-text);
+  background-color: var(--transparency-medium);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-small);
+  box-shadow: var(--shadow-small);
+  text-align: center;
+  max-width: 80%;
+  word-wrap: break-word;
+  backdrop-filter: blur(10px);
+  border: var(--border-thin);
+}
+
+#loadingSpinner {
+  display: none;
+  font-size: var(--font-size-lg);
+  margin-top: var(--spacing-lg);
+  color: var(--color-text-secondary);
+}
+
+#trackList {
+  margin-top: var(--spacing-lg);
+  width: 100%;
+  max-width: 500px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--transparency-medium);
+  border-radius: var(--radius-small);
+  padding: var(--spacing-sm);
+  backdrop-filter: blur(10px);
+  border: var(--border-thin);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-background);
+}
+
+.trackItem {
+  padding: var(--spacing-sm);
+  border-bottom: var(--border-thin);
+  cursor: pointer;
+  transition: background-color var(--transition-medium);
+  border-radius: calc(var(--radius-small) - 2px);
+}
+
+.trackItem:last-child {
+  border-bottom: none;
+}
+
+.trackItem:hover {
+  background-color: var(--transparency-high);
+}
+
+.trackItem.active {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+/* ======= SCROLLBAR STYLING ======= */
+/* Firefox scrollbar styling */
+#trackList {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-background);
+}
+
+/* Chrome/Safari scrollbar styling */
+#trackList::-webkit-scrollbar {
+  width: 8px;
+}
+
+#trackList::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border-radius: 4px;
+}
+
+#trackList::-webkit-scrollbar-track {
+  background-color: var(--color-background);
+}
+
+/* Scrollbar Styling for about content */
+.about-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.about-content::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border-radius: 4px;
+}
+
+.about-content::-webkit-scrollbar-track {
+  background-color: var(--transparency-medium);
+}
+
+/* ======= SELECT ELEMENTS ======= */
+select {
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-md);
+  border-radius: var(--radius-small);
+  border: var(--border-thin);
+  background-color: var(--transparency-medium);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  max-width: 300px;
+  cursor: pointer;
+  transition: border-color var(--transition-medium), box-shadow var(--transition-medium);
+  backdrop-filter: blur(10px);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+select:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 16px rgba(76, 175, 80, 0.5);
+}
+
+#readerSelect, #languageSelect {
+  text-align: center;
+  width: fit-content;
+  margin: 0 auto;
+  display: block;
+}
+
+#readerSelect option, #languageSelect option {
+  text-align: center;
+  background-color: #333;
+  color: var(--color-text);
+  padding: var(--spacing-sm);
+}
+
+option:hover {
+  background-color: var(--color-primary);
+}
+
+.language-select {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.language-select select {
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-md);
+  border-radius: var(--radius-small);
+  border: var(--border-thin);
+  background-color: var(--transparency-medium);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color var(--transition-medium), box-shadow var(--transition-medium);
+  backdrop-filter: blur(10px);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+}
+
+.language-select select:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+}
+
+.language-select select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 16px rgba(76, 175, 80, 0.5);
+}
+
+/* ======= CONTAINERS AND TRANSITIONS ======= */
+.container, .container2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: var(--transparency-low);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  width: 90%;
+  max-width: 700px;
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(10px);
+  border: var(--border-thin);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform var(--transition-slow), 
+              opacity var(--transition-slow);
+}
+
+/* Main container positioning */
+.container {
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  z-index: 2;
+}
+
+/* About container positioning */
+.container2 {
+  left: 50%;
+  transform: translate(150%, -50%); /* Start off to the right */
+  opacity: 0;
+  z-index: 1;
+}
+
+/* Animation when main container is hidden */
+.container.active {
+  transform: translate(-150%, -50%); /* Move to the left */
+  opacity: 0;
+}
+
+/* Animation when about container is visible */
+.container2.active {
+  transform: translate(-50%, -50%); /* Move to center */
+  opacity: 1;
+}
+
+/* ======= NAVIGATION CIRCLES ======= */
+.circle-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  z-index: 10;
+}
+
+.circle {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-circle);
+  background-color: var(--transparency-medium);
+  cursor: pointer;
+  transition: all var(--transition-medium);
+  border: 2px solid transparent;
+}
+
+.circle.active {
+  background-color: var(--color-primary);
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.circle:hover {
+  background-color: var(--transparency-high);
+}
+
+#secondContainer .circle-container .circle:nth-child(2) {
+  background-color: var(--color-primary);
+}
+
+/* ======= ABOUT PAGE CONTENT ======= */
+.about-content {
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+.about-content h1 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-text);
+  font-size: var(--font-size-xxl);
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: var(--spacing-sm);
+}
+
+.about-content h2 {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-primary);
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+}
+
+.about-text {
+  background-color: var(--transparency-low);
+  border-radius: var(--radius-medium);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-small);
+}
+
+.about-text p {
+  margin-bottom: var(--spacing-md);
+  line-height: 1.6;
+}
+
+.about-text ul {
+  list-style-type: none;
+  padding-right: var(--spacing-lg);
+}
+
+.about-text ul li {
+  margin-bottom: var(--spacing-md);
+  position: relative;
+  padding-right: 25px;
+  line-height: 1.6;
+}
+
+.about-text ul li::before {
+  content: '•';
+  color: var(--color-primary);
+  font-weight: bold;
+  font-size: 1.5rem;
+  position: absolute;
+  right: 0;
+  top: -2px;
+}
+
+.about-text ul li strong {
+  color: var(--color-primary);
+  margin-right: var(--spacing-sm);
+}
+
+.about-text a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  transition: color var(--transition-medium);
+  font-weight: 500;
+}
+
+.about-text a:hover {
+  color: var(--color-primary-light);
+  text-decoration: underline;
+}
+
+/* ======= RTL/LTR DIRECTION CLASSES ======= */
+.rtl {
+  direction: rtl;
+}
+
+.ltr {
+  direction: ltr;
+}
+
+/* RTL (Arabic) bullet points */
+[dir="rtl"] .about-text ul li::before {
+  content: '•';
+  color: var(--color-primary);
+  font-weight: bold;
+  font-size: 1.5rem;
+  position: absolute;
+  right: 0;
+  top: -2px;
+}
+
+/* LTR (Other languages) bullet points */
+[dir="ltr"] .about-text ul li::before {
+  content: '•';
+  color: var(--color-primary);
+  font-weight: bold;
+  font-size: 1.5rem;
+  position: absolute;
+  left: 0;
+  top: -2px;
+}
+
+/* Adjust padding for list items based on direction */
+[dir="rtl"] .about-text ul li {
+  padding-right: 25px;
+  padding-left: 0;
+}
+
+[dir="ltr"] .about-text ul li {
+  padding-left: 25px;
+  padding-right: 0;
+}
+
+/* Direction-based Text Alignment */
+[dir="rtl"] .about-text {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="ltr"] .about-text {
+  text-align: left;
+  direction: ltr;
+}
+
+/* ======= KEYFRAMES (For future use) ======= */
+@keyframes slideIn {
+  from {
+    transform: translate(100%, -50%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-150%, -50%);
+    opacity: 0;
+  }
+}
+
+/* ======= RESPONSIVE DESIGN ======= */
+@media (max-width: 768px) {
+  h1 {
+    font-size: var(--font-size-xl);
+    margin-top: 80px;
+    text-align: center;
+  }
+
+  .container, .container2 {
+    padding: var(--spacing-lg);
+    width: 95%;
+  }
+
+  select {
+    font-size: var(--font-size-sm);
+    max-width: 100%;
+  }
+
+  button {
+    width: 100%;
+    padding: var(--spacing-md);
+    font-size: var(--font-size-md);
+  }
+
+  #currentTrack {
+    font-size: var(--font-size-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .language-select {
+    top: 10px;
+    right: 10px;
+  }
+
+  audio {
+    max-width: 100%;
+  }
+
+  #trackList {
+    max-height: 150px;
+  }
+  
+  .about-content {
+    padding: var(--spacing-sm);
+    max-height: 65vh;
+  }
+
+  .about-content h1 {
+    font-size: var(--font-size-xl);
+  }
+
+  .about-content h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .about-text {
+    padding: var(--spacing-md);
+  }
+  
+  .about-content::-webkit-scrollbar {
+    width: 0px; /* Hide scrollbar on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: var(--font-size-lg);
+    margin-top: 90px;
+  }
+
+  .container, .container2 {
+    padding: var(--spacing-md);
+  }
+
+  select {
+    font-size: var(--font-size-xs);
+  }
+
+  button {
+    font-size: var(--font-size-sm);
+  }
+
+  #currentTrack {
+    font-size: var(--font-size-sm);
+  }
+
+  .language-select select {
+    font-size: var(--font-size-sm);
+    padding: 8px;
+  }
+
+  .language-select {
+    top: 5px;
+    right: 5px;
+  }
+  
+  .about-content {
+    padding: var(--spacing-xs);
+    max-height: 60vh;
+  }
+
+  .about-content h1 {
+    font-size: var(--font-size-lg);
+  }
+
+  .about-content h2 {
+    font-size: var(--font-size-md);
+  }
+
+  .about-text {
+    padding: var(--spacing-sm);
+  }
+}
+
+/* ======= OPTIONAL: ADD A SUBTLE PATTERN OVERLAY TO THE BACKGROUND ======= */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3Ccircle cx='13' cy='13' r='1'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ======= OPTIONAL: FOCUS STYLES FOR ACCESSIBILITY ======= */
+:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

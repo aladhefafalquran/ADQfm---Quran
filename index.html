@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>البرنامج القرآني</title>
+  <!-- Link to the external CSS file -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container" id="mainContainer">
+    <h1 data-translate="البرنامج القرآني" data-ar="البرنامج القرآني">البرنامج القرآني</h1>
+    
+    <!-- Language Select Dropdown -->
+    <div class="language-select">
+      <select id="languageSelect">
+        <option value="ar">العربية - AR</option>
+        <option value="en">English - EN</option>
+        <option value="tr">Türkçe - TR</option>
+        <option value="de">Deutsch - DE</option>
+        <option value="fr">Français - FR</option>
+        <option value="hi">हिन्दी - HI</option>
+        <option value="id">Bahasa Indonesia - ID</option>
+        <option value="it">Italiano - IT</option>
+        <option value="ja">日本語 - JA</option>
+        <option value="ko">한국어 - KO</option>
+        <option value="nl">Nederlands - NL</option>
+        <option value="pt">Português - PT</option>
+        <option value="ru">Русский - RU</option>
+        <option value="sw">Kiswahili - SW</option>
+        <option value="zh">中文 (简体) - ZH</option>
+      </select>
+    </div>
+
+    <select id="readerSelect" onchange="loadSelectedReader()">
+      <option value="random" data-translate="قارئ عشوائي" data-ar="قارئ عشوائي">قارئ عشوائي</option>
+      <option value="exclusive" data-translate="محمود خليل الحصري" data-ar="محمود خليل الحصري">محمود خليل الحصري</option>
+      <option value="tobalawi" data-translate="محمد محمود الطبلاوي" data-ar="محمد محمود الطبلاوي">محمد محمود الطبلاوي</option>
+      <option value="manshawi" data-translate="محمد صديق المنشاوي" data-ar="محمد صديق المنشاوي">محمد صديق المنشاوي</option>
+      <option value="abdbasat" data-translate="عبد الباسط عبد الصمد" data-ar="عبد الباسط عبد الصمد">عبد الباسط عبد الصمد</option>
+      <option value="mahmoudbanna" data-translate="محمود علي البنا" data-ar="محمود علي البنا">محمود علي البنا</option>
+      <option value="mahmoudeyup" data-translate="محمد أيوب" data-ar="محمد أيوب">محمد أيوب</option>
+      <option value="SaadAlGhamdi" data-translate="سعد الغامدي" data-ar="سعد الغامدي">سعد الغامدي</option>
+    </select>
+
+    <audio id="audioPlayer" controls>
+      Your browser does not support the audio element.
+    </audio>
+
+    <button id="playButton" onclick="calculateTrackToPlay()" data-translate="تشغيل كبث قرآني" data-ar="تشغيل كبث قرآني">تشغيل كبث قرآني</button>
+    <div id="currentTrack" data-translate="لاتوجد وسائط قيد التشغيل" data-ar="لاتوجد وسائط قيد التشغيل">لاتوجد وسائط قيد التشغيل</div>
+    <div id="loadingSpinner">جاري التجهيز...</div>
+    <div id="trackList"></div>
+
+    <!-- Circle Container -->
+    <div class="circle-container">
+      <div class="circle active" onclick="toggleCircle(1)"></div>
+      <div class="circle" onclick="toggleCircle(2)"></div>
+    </div>
+  </div>
+
+  <!-- Second Container -->
+  <div class="container2" id="secondContainer">
+    <div class="about-content">
+      <h1 data-translate="about_title" data-ar="عن الإذاعة">عن الإذاعة</h1>
+      <div class="about-text rtl">
+        <p data-translate="about_welcome" data-ar="نرحب بكم في إذاعة على ضفاف القرآن، وجهتك المفضلة للاستماع إلى القرآن الكريم برواية حفص عن عاصم. نسعى جاهدين لتوفير تجربة استماع فريدة ومريحة لجميع محبي القرآن.">نرحب بكم في إذاعة على ضفاف القرآن، وجهتك المفضلة للاستماع إلى القرآن الكريم برواية حفص عن عاصم. نسعى جاهدين لتوفير تجربة استماع فريدة ومريحة لجميع محبي القرآن.</p>
+        
+        <h2 data-translate="about_features" data-ar="ما يميزنا:">ما يميزنا:</h2>
+        <ul>
+          <li><strong data-translate="about_feature1" data-ar="تنوع القراء والسور:">تنوع القراء والسور:</strong> <span data-translate="about_feature1_desc" data-ar="نقدم لك مجموعة واسعة من القراء المتميزين، ويمكنك اختيار السورة التي ترغب في الاستماع إليها بحرية تامة.">نقدم لك مجموعة واسعة من القراء المتميزين، ويمكنك اختيار السورة التي ترغب في الاستماع إليها بحرية تامة.</span></li>
+          <li><strong data-translate="about_feature2" data-ar="الاستماع العشوائي:">الاستماع العشوائي:</strong> <span data-translate="about_feature2_desc" data-ar="استمتع بتجربة استماع جديدة في كل مرة، حيث يمكنك اختيار الاستماع العشوائي للقراء.">استمتع بتجربة استماع جديدة في كل مرة، حيث يمكنك اختيار الاستماع العشوائي للقراء.</span></li>
+          <h2 data-translate="about_apps" data-ar="عن برامجنا:">عن برامجنا:</h2>
+          <li>
+            <strong data-translate="about_feature3_4" data-ar="التفسير الصوتي والبث المباشر:">التفسير الصوتي والبث المباشر:</strong>
+            <span data-translate="about_feature3_4_desc_part1" data-ar="إلى جانب التلاوات القرآنية، نقدم لك دروسًا تفسيرية صوتية باللغة العربية لتعميق فهمك ومعرفتك بالقرآن الكريم، بالإضافة إلى بث مباشر لإذاعتنا على مدار الساعة عبر">
+                إلى جانب التلاوات القرآنية، نقدم لك دروسًا تفسيرية صوتية باللغة العربية لتعميق فهمك ومعرفتك بالقرآن الكريم، بالإضافة إلى بث مباشر لإذاعتنا على مدار الساعة عبر
+            </span>
+            <a href="https://adqfm.net/" target="_blank" rel="noopener noreferrer" data-translate="about_website" data-ar="موقعنا الإلكتروني">موقعنا الإلكتروني</a>
+            <span data-translate="about_or" data-ar="أو">أو</span>
+            <span data-translate="about_download_app_text" data-ar="قم بتحميل تطبيقنا من">قم بتحميل تطبيقنا من</span>
+            <a href="https://play.google.com/store/apps/details?id=com.adqfm.ARFM" target="_blank" rel="noopener noreferrer" onclick="openGooglePlay()" data-translate="about_google_play" data-ar="متجر جوجل بلاي">متجر جوجل بلاي</a>.
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Circle Container for Second Container -->
+    <div class="circle-container">
+      <div class="circle active" onclick="toggleCircle(1)"></div>
+      <div class="circle" onclick="toggleCircle(2)"></div>
+    </div>
+  </div>
+
+  <!-- Link to the external JavaScript file -->
+  <script src="script.js"></script>
+</body>
+</html>
