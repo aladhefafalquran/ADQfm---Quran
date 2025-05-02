@@ -1,107 +1,11 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="mobile-web-app-capable" content="yes">
-  <title>البرنامج القرآني</title>
-  <link rel="stylesheet" href="style.css">
-  
+  <meta http-equiv="refresh" content="0; url=https://aladhefafalquran.github.io/ADQfm---Quran/index.html">
+  <title>Redirecting...</title>
 </head>
 <body>
-  <div class="container" id="mainContainer">
-    <h1 data-translate="البرنامج القرآني" data-ar="البرنامج القرآني">البرنامج القرآني</h1>
-    
-    <!-- Language Select Dropdown -->
-    <div class="language-select">
-      <select id="languageSelect">
-        <option value="ar">العربية - AR</option>
-        <option value="en">English - EN</option>
-        <option value="tr">Türkçe - TR</option>
-        <option value="de">Deutsch - DE</option>
-        <option value="fr">Français - FR</option>
-        <option value="hi">हिन्दी - HI</option>
-        <option value="id">Bahasa Indonesia - ID</option>
-        <option value="it">Italiano - IT</option>
-        <option value="ja">日本語 - JA</option>
-        <option value="ko">한국어 - KO</option>
-        <option value="nl">Nederlands - NL</option>
-        <option value="pt">Português - PT</option>
-        <option value="ru">Русский - RU</option>
-        <option value="sw">Kiswahili - SW</option>
-        <option value="zh">中文 (简体) - ZH</option>
-      </select>
-    </div>
-
-    <select id="readerSelect" onchange="loadSelectedReader()">
-      <option value="random" data-translate="قارئ عشوائي" data-ar="قارئ عشوائي">قارئ عشوائي</option>
-      <option value="exclusive" data-translate="محمود خليل الحصري" data-ar="محمود خليل الحصري">محمود خليل الحصري</option>
-      <option value="tobalawi" data-translate="محمد محمود الطبلاوي" data-ar="محمد محمود الطبلاوي">محمد محمود الطبلاوي</option>
-      <option value="manshawi" data-translate="محمد صديق المنشاوي" data-ar="محمد صديق المنشاوي">محمد صديق المنشاوي</option>
-      <option value="abdbasat" data-translate="عبد الباسط عبد الصمد" data-ar="عبد الباسط عبد الصمد">عبد الباسط عبد الصمد</option>
-      <option value="mahmoudbanna" data-translate="محمود علي البنا" data-ar="محمود علي البنا">محمود علي البنا</option>
-      <option value="mahmoudeyup" data-translate="محمد أيوب" data-ar="محمد أيوب">محمد أيوب</option>
-      <option value="SaadAlGhamdi" data-translate="سعد الغامدي" data-ar="سعد الغامدي">سعد الغامدي</option>
-    </select>
-
-    <audio id="audioPlayer" controls>
-      Your browser does not support the audio element.
-    </audio>
-
-    <button id="playButton" onclick="calculateTrackToPlay()" data-translate="تشغيل كبث قرآني" data-ar="تشغيل كبث قرآني">تشغيل كبث قرآني</button>
-    <div id="currentTrack" data-translate="لاتوجد وسائط قيد التشغيل" data-ar="لاتوجد وسائط قيد التشغيل">لاتوجد وسائط قيد التشغيل</div>
-    <div id="loadingSpinner" data-translate="جاري التجهيز..." data-ar="جاري التجهيز...">جاري التجهيز...</div>
-    <div id="trackList"></div>
-
-    <!-- Circle Container -->
-    <div class="circle-container">
-      <div class="circle active" onclick="toggleCircle(1)"></div>
-      <div class="circle" onclick="toggleCircle(2)"></div>
-    </div>
-  </div>
-
-  <!-- Second Container (About Page) -->
-  <div class="container2" id="secondContainer">
-    <div class="about-content">
-      <h1 data-translate="البرنامج القرآني" data-ar="البرنامج القرآني">البرنامج القرآني</h1>
-      <div class="about-text rtl">
-        <h2 data-translate="عن التطبيق" data-ar="عن التطبيق">عن التطبيق</h2>
-        <p data-translate="هذا التطبيق تم تطويره لتقديم خدمة الاستماع للقرآن الكريم بتلاوات مختلفة لمشاهير القراء" data-ar="هذا التطبيق تم تطويره لتقديم خدمة الاستماع للقرآن الكريم بتلاوات مختلفة لمشاهير القراء">
-          هذا التطبيق تم تطويره لتقديم خدمة الاستماع للقرآن الكريم بتلاوات مختلفة لمشاهير القراء
-        </p>
-        <h2 data-translate="المميزات" data-ar="المميزات">المميزات</h2>
-        <ul>
-          <li data-translate="الاستماع للقرآن الكريم بصوت عدة قراء" data-ar="الاستماع للقرآن الكريم بصوت عدة قراء">
-            <strong>01</strong> الاستماع للقرآن الكريم بصوت عدة قراء
-          </li>
-          <li data-translate="تشغيل البث المباشر" data-ar="تشغيل البث المباشر">
-            <strong>02</strong> تشغيل البث المباشر
-          </li>
-          <li data-translate="واجهة مستخدم سهلة وبسيطة" data-ar="واجهة مستخدم سهلة وبسيطة">
-            <strong>03</strong> واجهة مستخدم سهلة وبسيطة
-          </li>
-          <li data-translate="دعم عدة لغات عالمية" data-ar="دعم عدة لغات عالمية">
-            <strong>04</strong> دعم عدة لغات عالمية
-          </li>
-        </ul>
-      </div>
-    </div>
-    
-    <!-- Circle Container for Second Container -->
-    <div class="circle-container">
-      <div class="circle" onclick="toggleCircle(1)"></div>
-      <div class="circle active" onclick="toggleCircle(2)"></div>
-    </div>
-  </div>
-
-  <!-- Error message container -->
-  <div id="errorMessage" class="error-message"></div>
-
-  <!-- Script loading order is important -->
-  <script src="decoder.js"></script>
-  <script src="OggDecoder.js"></script>
-  <script src="main.js"></script>
+  <p>If you are not redirected automatically, <a href="https://aladhefafalquran.github.io/ADQfm---Quran/index.html">click here</a>.</p>
 </body>
 </html>
